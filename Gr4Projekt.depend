@@ -1,0 +1,91 @@
+# depslib dependency file v1.0
+1461324914 source:c:\users\aigeth\documents\gr4projekt\main.c
+	"SDL.h"
+	<SDL_image.h>
+	<time.h>
+	<stdio.h>
+	<stdbool.h>
+	"main.h"
+	"playField.h"
+	"gameStruct.h"
+	"loadMedia.h"
+	"processEvents.h"
+
+1394940796 c:\users\aigeth\documents\gr4projekt\sdl.h
+	"SDL_main.h"
+	"SDL_stdinc.h"
+	"SDL_assert.h"
+	"SDL_atomic.h"
+	"SDL_audio.h"
+	"SDL_clipboard.h"
+	"SDL_cpuinfo.h"
+	"SDL_endian.h"
+	"SDL_error.h"
+	"SDL_events.h"
+	"SDL_filesystem.h"
+	"SDL_joystick.h"
+	"SDL_gamecontroller.h"
+	"SDL_haptic.h"
+	"SDL_hints.h"
+	"SDL_loadso.h"
+	"SDL_log.h"
+	"SDL_messagebox.h"
+	"SDL_mutex.h"
+	"SDL_power.h"
+	"SDL_render.h"
+	"SDL_rwops.h"
+	"SDL_system.h"
+	"SDL_thread.h"
+	"SDL_timer.h"
+	"SDL_version.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1461321234 c:\users\aigeth\documents\gr4projekt\gamestruct.h
+
+1461153148 c:\users\aigeth\documents\gr4projekt\loadmedia.h
+
+1461322306 c:\users\aigeth\documents\gr4projekt\main.h
+	"SDL.h"
+
+1461323921 source:c:\users\aigeth\documents\gr4projekt\loadmedia.c
+	"SDL.h"
+	<SDL_image.h>
+	<stdio.h>
+	<stdbool.h>
+	"main.h"
+	"playField.h"
+	"gameStruct.h"
+	"loadMedia.h"
+	"processEvents.h"
+
+1461324366 c:\users\aigeth\documents\gr4projekt\playfield.h
+
+1461324613 c:\users\aigeth\documents\gr4projekt\processevents.h
+
+1461324613 source:c:\users\aigeth\documents\gr4projekt\processevents.c
+	"SDL.h"
+	<SDL_image.h>
+	<stdio.h>
+	<stdbool.h>
+	"main.h"
+	"playField.h"
+	"gameStruct.h"
+	"loadMedia.h"
+	"processEvents.h"
+
+1461325355 source:c:\users\aigeth\documents\gr4projekt\playfield.c
+	"main.h"
+
+1461324506 source:c:\users\aigeth\documents\gr4projekt\dorender.c
+	"SDL.h"
+	<SDL_image.h>
+	<stdio.h>
+	<stdbool.h>
+	"main.h"
+	"playField.h"
+	"gameStruct.h"
+	"loadMedia.h"
+	"processEvents.h"
+

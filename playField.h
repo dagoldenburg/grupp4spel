@@ -1,0 +1,5 @@
+#ifndef PLAYFIELD_H_INCLUDED
+#define PLAYFIELD_H_INCLUDED
+
+int playfield[COLUMNS][ROWS];
+#endif // PLAYFIELD_H_INCLUDED
