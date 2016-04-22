@@ -15,7 +15,7 @@ typedef struct
 
     int mVelX;
     int mVelY;
-}Dot;
+}Entity;
 
 typedef struct
 {
@@ -25,7 +25,7 @@ typedef struct
 
 typedef struct
 {
-    Dot Dot;
+    Entity Entity;
     Tile tileSet[TOTAL_TILES];
     LTexture gDotTexture;
     LTexture gTileTexture;

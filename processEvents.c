@@ -10,12 +10,24 @@
 
 int getmPosX(GameState *game)
 {
-    return game->Dot.mPosX;
+    return game->Entity.mPosX;
 }
 int getmPosY(GameState *game)
 {
-    return game->Dot.mPosY;
+    return game->Entity.mPosY;
 }
+
+int collisionDetection(Entity *object){
+    for(int i = 0; i<TOTAL_COLLISION_TILES; i++) {
+            if(playfield[object->mPosY/TILESIZE][object->mPosX/TILESIZE]==collisionTiles[i] //Kontrollerar om det finns ett hinder, annars flyttar objektet
+            &&  playfield[(object->mPosY + TILESIZE/2)/TILESIZE][(object->mPosX + TILESIZE/2)/TILESIZE]==collisionTiles[i]) {
+                return 1;
+            }
+    }
+
+    return 0;
+}
+
 
 
 
@@ -55,58 +67,68 @@ int processEvents(SDL_Window *window, GameState *game)
     }
     }
 
-    const Uint8 *state = SDL_GetKeyboardState(NULL); //Flyttar på spelaren om det inte finns hinder
+    const Uint8 *state = SDL_GetKeyboardState(NULL); //Flyttar på spelaren om det inte finns hinder(Collision detection)
     if(state[SDL_SCANCODE_LEFT])
     {
-        if(playfield[(game->Dot.mPosY + 10)/TILESIZE][(game->Dot.mPosX -10)/TILESIZE]!=3 //Kontrollerar om det finns ett hinder, annars flyttar spelaren
-           &&  playfield[(game->Dot.mPosY)/TILESIZE][(game->Dot.mPosX  -10)/TILESIZE]!=3) {
-            game->Dot.mPosX -= 5;
+        game->Entity.mPosX -= PLAYER_SPEED;
+
+        if(collisionDetection(&game->Entity)) {
+           game->Entity.mPosX += PLAYER_SPEED;
         }
+
+
     }
+
     if(state[SDL_SCANCODE_RIGHT])
     {
-        if(playfield[(game->Dot.mPosY + 10)/TILESIZE][(game->Dot.mPosX + 20)/TILESIZE]!=3//Kontrollerar om det finns ett hinder, annars flyttar spelaren
-           &&  playfield[(game->Dot.mPosY)/TILESIZE][(game->Dot.mPosX + 20)/TILESIZE]!=3) {
-            game->Dot.mPosX += 5;
+        game->Entity.mPosX += PLAYER_SPEED;
+
+        if(collisionDetection(&game->Entity)){
+           game->Entity.mPosX -= PLAYER_SPEED;
         }
     }
+
     if(state[SDL_SCANCODE_UP])
     {
-        if(playfield[(game->Dot.mPosY - 10)/TILESIZE][(game->Dot.mPosX + 10)/TILESIZE]!=3//Kontrollerar om det finns ett hinder, annars flyttar spelaren
-           &&  playfield[(game->Dot.mPosY - 10)/TILESIZE][(game->Dot.mPosX + 10)/TILESIZE]!=3) {
-              game->Dot.mPosY -= 5;
+        game->Entity.mPosY -= PLAYER_SPEED;
+
+        if(collisionDetection(&game->Entity)){
+           game->Entity.mPosY += PLAYER_SPEED;
         }
     }
+
     if(state[SDL_SCANCODE_DOWN])
     {
-        if(playfield[(game->Dot.mPosY + 20)/TILESIZE][(game->Dot.mPosX + 10)/TILESIZE]!=3//Kontrollerar om det finns ett hinder, annars flyttar spelaren
-           &&  playfield[(game->Dot.mPosY + 20)/TILESIZE][(game->Dot.mPosX + 10)/TILESIZE]!=3) {
-              game->Dot.mPosY += 5;
+        game->Entity.mPosY += PLAYER_SPEED;
+
+        if(collisionDetection(&game->Entity)){
+           game->Entity.mPosY -= PLAYER_SPEED;
         }
     }
 
-    if( game->Dot.mPosX<0 )
-    {
-        game->Dot.mPosX=0;
-    }
-    if( game->Dot.mPosX+20>LEVEL_WIDTH )
-    {
-        game->Dot.mPosX=LEVEL_WIDTH-20;
-    }
 
-    if( game->Dot.mPosY<0  )
+    if( game->Entity.mPosX<0 )
     {
-        game->Dot.mPosY=0;
+        game->Entity.mPosX=0;
     }
-      if( game->Dot.mPosY+20>LEVEL_HEIGHT )
+    if( game->Entity.mPosX+20>LEVEL_WIDTH )
     {
-        game->Dot.mPosY=LEVEL_HEIGHT-20;
+        game->Entity.mPosX=LEVEL_WIDTH-20;
     }
 
+    if( game->Entity.mPosY<0  )
+    {
+        game->Entity.mPosY=0;
+    }
+      if( game->Entity.mPosY+20>LEVEL_HEIGHT )
+    {
+        game->Entity.mPosY=LEVEL_HEIGHT-20;
+    }
 
 
-    printf("camera: %d\n",game->Dot.mPosX );
-    printf("man: %d\n",game->Dot.mPosY );
+
+    printf("camera: %d\n",game->Entity.mPosX );
+    printf("man: %d\n",game->Entity.mPosY );
 
   return done;
 

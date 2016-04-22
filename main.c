@@ -32,10 +32,10 @@ int main(int argc, char *argv[])
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_Rect camera= {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 
-    gamestate.Dot.mPosX=0;
-    gamestate.Dot.mPosY=0;
-    gamestate.Dot.mVelX=0;
-    gamestate.Dot.mVelY=0;
+    gamestate.Entity.mPosX=0;
+    gamestate.Entity.mPosY=0;
+    gamestate.Entity.mVelX=0;
+    gamestate.Entity.mVelY=0;
     gamestate.renderer=renderer;
 
     loadMedia(&gamestate);

@@ -2,4 +2,5 @@
 #define PLAYFIELD_H_INCLUDED
 
 int playfield[COLUMNS][ROWS];
+int collisionTiles[TOTAL_COLLISION_TILES];
 #endif // PLAYFIELD_H_INCLUDED
