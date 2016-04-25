@@ -4,6 +4,6 @@
 int getmPosX(GameState *game);
 int getmPosY(GameState *game);
 int collisionDetection(Entity *object);
-int processEvents(SDL_Window *window, GameState *game);
+int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera);
 
 #endif // PROCESSEVENTS_H_INCLUDED

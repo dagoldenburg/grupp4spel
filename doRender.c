@@ -1,12 +1,10 @@
 #include "SDL.h"
-#include <SDL_image.h>
+//#include <SDL_image.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include "main.h"
 #include "playField.h"
 #include "gameStruct.h"
-#include "loadMedia.h"
-#include "processEvents.h"
 
 void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 {
@@ -43,8 +41,6 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 
     }
 
-
-
 //
 //    SDL_Rect camera={0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 //    SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&mCam,&camera);
@@ -53,8 +49,23 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 
     //set the drawing color to white
     SDL_Rect rect = {game->Entity.mPosX-mCam.x,game->Entity.mPosY-mCam.y, TILESIZE, TILESIZE };
-    SDL_RenderCopy(renderer,game->gDotTexture.mTexture,NULL,&rect);
+
+    SDL_RenderCopy(renderer,game->gPlayerTexture.mTexture,&spriteFacing,&rect);
    // SDL_RenderFillRect(renderer, &rect);
+
+    if(SDL_SetRenderDrawColor( renderer, 0xFF, 0x00, 0x00, 0xFF )){
+        printf("Could not set render draw color for healthbar max. SDL_ERROR: %s\n", SDL_GetError());
+    }
+
+    if(SDL_RenderFillRect( renderer, &game->Entity.hpData.healthBarMax )<0){
+        printf("Couldnt render fill rect healthbar max. SDL_ERROR: %s\n", SDL_GetError());
+    }
+    if(SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0x00, 0xFF )){
+        printf("Could not set render draw color for healthbar current. SDL_ERROR: %s\n", SDL_GetError());
+    }
+    if(SDL_RenderFillRect( renderer, &game->Entity.hpData.healthBarCurrent )<0){
+        printf("Couldnt render fill rect for healthbar current. SDL_ERROR: %s\n", SDL_GetError());
+    }
 
     SDL_RenderPresent(renderer);
 }

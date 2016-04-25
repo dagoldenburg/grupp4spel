@@ -9,19 +9,16 @@
 #include "processEvents.h"
 
 
-
 void loadMedia(GameState *game)
 {
      SDL_Surface *loadedSurface=NULL;
 
-
     loadedSurface=IMG_Load("tiles.png");
     if(loadedSurface==NULL)
     {
-        printf("Cannot find tiles.png\n\n");
+        printf("%s\n", SDL_GetError());
         SDL_Quit();
         exit(1);
-
     }
     game->gTileTexture.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
 
@@ -59,27 +56,25 @@ void loadMedia(GameState *game)
 //    }
     SDL_FreeSurface( loadedSurface );
 
-    loadedSurface=IMG_Load("dot.png");
-
-    SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0xFF, 0xFF));
-
+    loadedSurface=IMG_Load("spriteSheet2.bmp");
     if(loadedSurface==NULL)
     {
-        printf("Cannot find tiles.png\n\n");
+        printf("%s\n", SDL_GetError());
         SDL_Quit();
         exit(1);
-
     }
-    game->gDotTexture.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
-    if(game->gDotTexture.mTexture==NULL)
+
+    SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xE0, 0x80, 0xC0));
+    game->gPlayerTexture.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
+    if(game->gPlayerTexture.mTexture==NULL)
     {
-        printf( "Unable to create texture from game->gDotTexture.mTexture! SDL Error: \n");
+        printf( "Unable to create texture from game->gDotTexture.mTexture! SDL Error: \n",SDL_GetError());
 
     }
     else
     {
-        game->gDotTexture.mWidth=loadedSurface->w;
-        game->gDotTexture.mHeight=loadedSurface->h;
+        game->gPlayerTexture.mWidth=loadedSurface->w;
+        game->gPlayerTexture.mHeight=loadedSurface->h;
     }
     SDL_FreeSurface( loadedSurface );
 

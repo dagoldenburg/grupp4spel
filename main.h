@@ -19,9 +19,8 @@
 #define TILE_RED 2
 #define TILE_GREEN 1
 #define TILE_BLACK 0
-#define PLAYER_SPEED 5
 
-
+extern SDL_Rect spriteFacing;
 
 
 

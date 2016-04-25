@@ -1,5 +1,5 @@
-#include "SDL.h"
-#include <SDL_image.h>
+#include <SDL.h>
+//#include <SDL_image.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -8,7 +8,11 @@
 #include "gameStruct.h"
 #include "loadMedia.h"
 #include "processEvents.h"
+#include "collision.h"
 
+
+
+    SDL_Rect spriteFacing;
 
 int main(int argc, char *argv[])
 {
@@ -30,13 +34,22 @@ int main(int argc, char *argv[])
                             0                                  // flags
                             );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_Rect camera= {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 
+
+    SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
+
+    //Player attributes
     gamestate.Entity.mPosX=0;
     gamestate.Entity.mPosY=0;
     gamestate.Entity.mVelX=0;
     gamestate.Entity.mVelY=0;
     gamestate.renderer=renderer;
+    gamestate.Entity.hpData.maxHp = 100.0;
+    gamestate.Entity.hpData.currentHp = 50.0;
+    gamestate.Entity.hpData.sizeOfHealthbar = 32;
+    gamestate.Entity.hpData.healthBarCurrent.h = 8;
+    gamestate.Entity.hpData.healthBarMax.h = 8;
+
 
     loadMedia(&gamestate);
 
@@ -45,36 +58,31 @@ int main(int argc, char *argv[])
 
     /**Event loop*/
     int done = 0;
-
+    spriteFacing.w = 32;
+    spriteFacing.h = 32;
   //Event loop
     while(!done)
     {
     //Check for events
 
-
-        done = processEvents(window, &gamestate);
-        camera.x=(getmPosX(&gamestate)+ 20/2)-SCREEN_WIDTH/2;
-        camera.y=(getmPosY(&gamestate)+20/2)-SCREEN_HEIGHT/2;
-        if( camera.x < 0 )
-        {
+        done = processEvents(window, &gamestate,camera);
+        camera.x=(getmPosX(&gamestate)+ 20/2)-(SCREEN_WIDTH/2);
+        camera.y=(getmPosY(&gamestate)+20/2)-(SCREEN_HEIGHT/2);
+        if( camera.x < 0 ){
             camera.x = 0;
         }
-        if( camera.y < 0 )
-        {
+        if( camera.y < 0 ){
             camera.y = 0;
         }
-        if( camera.x > LEVEL_WIDTH - camera.w )
-        {
+        if( camera.x > LEVEL_WIDTH - camera.w ){
             camera.x = LEVEL_WIDTH - camera.w;
         }
-        if( camera.y > LEVEL_HEIGHT - camera.h )
-        {
+        if( camera.y > LEVEL_HEIGHT - camera.h ){
             camera.y = LEVEL_HEIGHT - camera.h;
         }
 
-
     //Render display
-        doRender(renderer, &gamestate,camera);
+        doRender(renderer, &gamestate, camera);
 
     //don't burn up the CPU
         SDL_Delay(10);
@@ -83,8 +91,7 @@ int main(int argc, char *argv[])
 
   // Close and destroy the window
     SDL_DestroyTexture(gamestate.gTileTexture.mTexture);
-
-    SDL_DestroyTexture(gamestate.gDotTexture.mTexture);
+    SDL_DestroyTexture(gamestate.gPlayerTexture.mTexture);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 

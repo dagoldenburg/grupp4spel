@@ -8,6 +8,15 @@ typedef struct
     SDL_Texture* mTexture;
 
 }LTexture;
+
+typedef struct {
+    int sizeOfHealthbar;
+    float maxHp;
+    float currentHp;
+    SDL_Rect healthBarCurrent;
+    SDL_Rect healthBarMax;
+} HitPointData;
+
 typedef struct
 {
     int mPosX;
@@ -15,6 +24,7 @@ typedef struct
 
     int mVelX;
     int mVelY;
+    HitPointData hpData;
 }Entity;
 
 typedef struct
@@ -23,14 +33,17 @@ typedef struct
     SDL_Rect mBox;
 }Tile;
 
+
+
 typedef struct
 {
     Entity Entity;
     Tile tileSet[TOTAL_TILES];
-    LTexture gDotTexture;
+    LTexture gPlayerTexture;
     LTexture gTileTexture;
     SDL_Rect TileClip[4];
     SDL_Renderer *renderer;
+
 
 }GameState;
 
