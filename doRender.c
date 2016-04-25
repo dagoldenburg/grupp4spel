@@ -52,7 +52,7 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
     SDL_SetRenderDrawColor(renderer, 255,255, 255, 255);
 
     //set the drawing color to white
-    SDL_Rect rect = {game->Entity.mPosX-mCam.x,game->Entity.mPosY-mCam.y, 32, 32 };
+    SDL_Rect rect = {game->Entity.mPosX-mCam.x,game->Entity.mPosY-mCam.y, TILESIZE, TILESIZE };
     SDL_RenderCopy(renderer,game->gDotTexture.mTexture,NULL,&rect);
    // SDL_RenderFillRect(renderer, &rect);
 

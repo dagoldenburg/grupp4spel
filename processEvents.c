@@ -42,8 +42,6 @@ int collisionDetection(Entity *object){
                 return 1;
             }
 
-
-
     }
 
     return 0;
@@ -132,18 +130,18 @@ int processEvents(SDL_Window *window, GameState *game)
     {
         game->Entity.mPosX=0;
     }
-    if( game->Entity.mPosX+20>LEVEL_WIDTH )
+    if( game->Entity.mPosX+TILESIZE + PLAYER_SPEED>LEVEL_WIDTH )
     {
-        game->Entity.mPosX=LEVEL_WIDTH-20;
+        game->Entity.mPosX=LEVEL_WIDTH-TILESIZE - PLAYER_SPEED;
     }
 
     if( game->Entity.mPosY<0  )
     {
         game->Entity.mPosY=0;
     }
-      if( game->Entity.mPosY+20>LEVEL_HEIGHT )
+      if( game->Entity.mPosY+TILESIZE + PLAYER_SPEED>LEVEL_HEIGHT )
     {
-        game->Entity.mPosY=LEVEL_HEIGHT-20;
+        game->Entity.mPosY=LEVEL_HEIGHT-TILESIZE - PLAYER_SPEED;
     }
 
 
