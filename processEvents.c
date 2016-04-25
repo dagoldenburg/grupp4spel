@@ -19,10 +19,31 @@ int getmPosY(GameState *game)
 
 int collisionDetection(Entity *object){
     for(int i = 0; i<TOTAL_COLLISION_TILES; i++) {
-            if(playfield[object->mPosY/TILESIZE][object->mPosX/TILESIZE]==collisionTiles[i] //Kontrollerar om det finns ett hinder, annars flyttar objektet
-            &&  playfield[(object->mPosY + TILESIZE/2)/TILESIZE][(object->mPosX + TILESIZE/2)/TILESIZE]==collisionTiles[i]) {
+            if(playfield[(object->mPosY + 5)/TILESIZE][(object->mPosX + 5)/TILESIZE]==collisionTiles[i]) //Kontrollerar om det finns ett hinder, annars flyttar objektet
+            {
+                printf("Upper box\n");
                 return 1;
             }
+            if(playfield[(object->mPosY + TILESIZE - 5)/TILESIZE][(object->mPosX + TILESIZE - 5)/TILESIZE]==collisionTiles[i])
+            {
+                printf("Lower box\n");
+                return 1;
+            }
+
+            if(playfield[(object->mPosY + 5)/TILESIZE][(object->mPosX + TILESIZE - 5)/TILESIZE]==collisionTiles[i])
+            {
+                printf("Right box\n");
+                return 1;
+            }
+
+            if(playfield[(object->mPosY + TILESIZE - 5)/TILESIZE][(object->mPosX + 5)/TILESIZE]==collisionTiles[i])
+            {
+                printf("Left box\n");
+                return 1;
+            }
+
+
+
     }
 
     return 0;
@@ -127,8 +148,8 @@ int processEvents(SDL_Window *window, GameState *game)
 
 
 
-    printf("camera: %d\n",game->Entity.mPosX );
-    printf("man: %d\n",game->Entity.mPosY );
+    //printf("manx: %d\n",game->Entity.mPosX );
+    //printf("many: %d\n",game->Entity.mPosY );
 
   return done;
 
