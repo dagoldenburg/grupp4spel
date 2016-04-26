@@ -35,7 +35,7 @@ int main(int argc ,char *argv[])
   // memset(&serv_addr,0,sizeof(serv_addr));
    serv_addr.sin_addr.s_addr=inet_addr(argv[1]);
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(SERV_PORT);
+    serv_addr.sin_port = htons(atoi(argv[2]));
   if (connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
     perror("connect");
     exit(1);
@@ -43,7 +43,7 @@ int main(int argc ,char *argv[])
 
   printf("Connected.\n");
 
-  
+
 	while(printf("> "), fgets(str, 100, stdin), !feof(stdin)) {
         if (send(s, str, strlen(str), 0) == -1) {
             perror("send");
@@ -66,10 +66,6 @@ int main(int argc ,char *argv[])
     }
 
     close(s);
-
-
-  
-
   return 0;
 }
 
