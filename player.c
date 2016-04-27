@@ -19,42 +19,60 @@ void UpdateHealthbar(GameState *game){
     game->Entity.hpData.healthBarMax.w = game->Entity.hpData.sizeOfHealthbar - sizeOfGreenbar; //sätter storleken av den röda baren till samma storlek den bör vara
 }
 
+void spawnAttack(Entity *player) {
+    player->attack = player->rect;
+    player->attack.w = TILESIZE / 4;
+    player->attack.h = TILESIZE / 8;
+}
+
+
 void ControlPlayer(GameState *game){
     const Uint8 *state = SDL_GetKeyboardState(NULL); //Flyttar på spelaren om det inte finns hinder(Collision detection)
 
     if(state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_A]){ // Spelaren går till vänster
         spriteFacing.x = 32;
         spriteFacing.y = 32;
-        game->Entity.mPosX -= PLAYER_SPEED;
+        game->Entity.rect.x -= PLAYER_SPEED;
         if(collisionDetection(&game->Entity)) {
-           game->Entity.mPosX += PLAYER_SPEED;
+           game->Entity.rect.x += PLAYER_SPEED;
         }
     }
 
     if(state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D]){ // Spelaren går till höger
         spriteFacing.x = 0;
         spriteFacing.y = 32;
-        game->Entity.mPosX += PLAYER_SPEED;
+        game->Entity.rect.x += PLAYER_SPEED;
         if(collisionDetection(&game->Entity)){
-           game->Entity.mPosX -= PLAYER_SPEED;
+           game->Entity.rect.x -= PLAYER_SPEED;
         }
     }
 
     if(state[SDL_SCANCODE_UP] || state[SDL_SCANCODE_W]){ // Spelaren går upp
         spriteFacing.x = 0;
         spriteFacing.y = 0;
-        game->Entity.mPosY -= PLAYER_SPEED;
+        game->Entity.rect.y -= PLAYER_SPEED;
         if(collisionDetection(&game->Entity)){
-           game->Entity.mPosY += PLAYER_SPEED;
+           game->Entity.rect.y += PLAYER_SPEED;
         }
     }
 
     if(state[SDL_SCANCODE_DOWN] || state[SDL_SCANCODE_S]){ // Spelaren går ner
         spriteFacing.x = 32;
         spriteFacing.y = 0;
-        game->Entity.mPosY += PLAYER_SPEED;
+        game->Entity.rect.y += PLAYER_SPEED;
         if(collisionDetection(&game->Entity)){
-           game->Entity.mPosY -= PLAYER_SPEED;
+           game->Entity.rect.y -= PLAYER_SPEED;
+        }
+    }
+
+    if(state[SDL_SCANCODE_SPACE]){ // Spelaren går Attackerar
+        spriteFacing.x = 32;
+        spriteFacing.y = 0;
+        game->Entity.rect.y += PLAYER_SPEED;
+        if(collisionDetection(&game->Entity)){
+           game->Entity.rect.y -= PLAYER_SPEED;
         }
     }
 }
+
+

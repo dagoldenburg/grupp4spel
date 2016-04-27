@@ -24,4 +24,5 @@ extern SDL_Rect spriteFacing;
 
 
 
+
 #endif // GAMESTRUCT_H_INCLUDED

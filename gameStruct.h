@@ -17,13 +17,15 @@ typedef struct {
     SDL_Rect healthBarMax;
 } HitPointData;
 
+
+
 typedef struct
 {
-    int mPosX;
-    int mPosY;
-
+    SDL_Rect rect;
     int mVelX;
     int mVelY;
+
+    SDL_Rect attack;
     HitPointData hpData;
 }Entity;
 

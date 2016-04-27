@@ -39,8 +39,10 @@ int main(int argc, char *argv[])
     SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 
     //Player attributes
-    gamestate.Entity.mPosX=0;
-    gamestate.Entity.mPosY=0;
+    gamestate.Entity.rect.x=0;
+    gamestate.Entity.rect.y=0;
+    gamestate.Entity.rect.h=32;
+    gamestate.Entity.rect.w=32;
     gamestate.Entity.mVelX=0;
     gamestate.Entity.mVelY=0;
     gamestate.renderer=renderer;
