@@ -9,8 +9,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define BUFFSIZE 4096
 #define SOCK_PATH "/tmp/socket"
@@ -32,6 +32,7 @@ int main(int argc ,char *argv[])
                 perror("ERROR opening socket");
     }
 
+
   // memset(&serv_addr,0,sizeof(serv_addr));
    serv_addr.sin_addr.s_addr=inet_addr(argv[1]);
     serv_addr.sin_family = AF_INET;
@@ -41,7 +42,7 @@ int main(int argc ,char *argv[])
     exit(1);
   }
 
-  printf("Connected.\n");
+  printf("Connected client.\n");
 
 
 	while(printf("> "), fgets(str, 100, stdin), !feof(stdin)) {
@@ -59,7 +60,7 @@ int main(int argc ,char *argv[])
             printf("echo> %s", str);
 
         } else {
-            if (t < 0) perror("recv");
+            if (t <= 0) perror("recv");
             else printf("Server closed connection\n");
             exit(1);
         }

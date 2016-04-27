@@ -15,10 +15,17 @@
 #include <sys/wait.h>
 #include <pthread.h>
 #include <netinet/in.h>
-#define maxplayer 2
+#include <fcntl.h>
+
+#define maxplayer 3
 __thread int threadLocal;
 __thread int joinQuerry;
+//__thread char clientIp[INET_ADDRSTRLEN];
+//char clientIpAddrRecv[INET_ADDRSTRLEN];
+
 char str[100];
+char str2[100];
+int next;
 
 struct clientData
 {
@@ -30,7 +37,6 @@ struct clientData
 
 pthread_mutex_t iMutex;
 
-#define SERV_PORT 3000
 
 static void daemonize(void)
 {
@@ -80,68 +86,68 @@ static void daemonize(void)
     int n,done;
  void* send_recv(void* clientData)
  {
-    printf("innan struct \n");
-    //struct clientData *c=malloc(sizeof(struct clientData));
-    struct clientData *c=(struct clientData *) clientData;
-    printf("iefter struct\n");
-    // threadlock
-    threadLocal=c->currentClient;
-    c->clientControl[c->currentClient]=1;
-    printf("1c->currentClient: %d\n",c->currentClient);
     int i;
-    for(i=0;i<maxplayer;i++)
-    {
-        if((c->clientControl[i])==0)
-        {
-            c->currentClient = c->clientControl[i];
-        }
-    }
-    printf("2c->currentClient: %d\n",c->currentClient);
-    //printf("%d",);
+    struct clientData *c=(struct clientData *) clientData;
+    threadLocal=c->currentClient;
     pthread_mutex_unlock(&iMutex);
 
         // thread release
-    printf("Connected.\n");
+    printf("Connected,threadlocal = %d.\n",threadLocal);
+    printf("Connected,currentclient = %d.\n",c->currentClient);
+    printf("Connected,clientControlToken = %d.\n",c->clientControl[threadLocal]);
 
-        printf("Done\n");
+
         done = 0;
-        printf("efter Done %d\n", done);
+        printf("c->client[threadLocal]: %d\n",c->client[threadLocal]);
         do {
-            n = recv(c->client[c->currentClient], str, 100, 0);
+            n = recv(c->client[threadLocal], str, 100, 0);
             if (n <= 0) {
-                if (n < 0) perror("recv");
-                done = 1;
-            }
+                if (n < 0) {
+                    n = recv(c->client[threadLocal], str2, 100, 0);
+                    c->currentClient = threadLocal;
+                    printf("\n\n recv error");
+                    printf("closing:%d\n",threadLocal);
+                    if(close(c->client[threadLocal])==-1){
 
+                        printf("Connected,client = %d.\n",c->client[threadLocal]);
+                        printf("no close on:%d\n",threadLocal);
+                    }
+                }
+                if (n == 0){
+                    pthread_mutex_lock(&iMutex);
+                    joinQuerry=threadLocal;
+                    c->currentClient = threadLocal;
+                    printf("closing:%d\n",c->client[threadLocal]);
+                    if(close(c->client[threadLocal])==-1){
+
+                        printf("no close on:%d\n",threadLocal);
+                    }
+                    c->clientControl[threadLocal]=0;
+                    next = threadLocal;
+                    printf("next i tråd: %d\n",next);
+                    printf("not connected\n");
+                    pthread_mutex_unlock(&iMutex);
+                    pthread_exit(NULL);
+                    return;
+                }
+                done = 1;
+                }
             if (!done)
-                if (send(c->client[c->currentClient], str, n, 0) < 0) {
+                if (send(c->client[threadLocal], str, n, 0) < 0) {
                     perror("send");
                     done = 1;
                 }
+
+
         } while (!done);
-        joinQuerry = 1;
-        c->clientControl[threadLocal]=0;
-        //pthtread lock
-
-        //i=firstFreeSlot();
-        //thread release
-
+        return;
  }
- int firstFreeSlot(struct clientData clientData)
- {
-    int i;
-    for(i=0;i<maxplayer;i++)
-    {
-        if((clientData.clientControl[i])==0)
-        {
-            return i;
-        }
-    }
- }
+
 
 int main(char argc ,char *argv[])
 {
-    int server,t, len,portno;
+    int server,t, len,portno,optval,errorhej = 0;
+    socklen_t optlen = sizeof(optval);
     struct clientData clientData;
     clientData.currentClient = 0;
 
@@ -152,8 +158,13 @@ int main(char argc ,char *argv[])
         perror("socket");
         exit(1);
     }
-
-
+  /*  optval = 1;
+    optlen = sizeof(optval);
+    if(setsockopt(server,SOL_SOCKET,SO_KEEPALIVE,&optval,optlen)<0){
+        perror("setsockopt()");
+        close(server);
+    }*/
+    printf("Hej %d\n",errorhej++);
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr=INADDR_ANY;
     server_address.sin_port=htons(atoi(argv[1]));
@@ -179,45 +190,70 @@ int main(char argc ,char *argv[])
     }
 
     pthread_mutex_init(&iMutex,NULL);
-    joinQuerry = 0;
+    joinQuerry = -1;
+    int i;
+    next = 0;
     for(;;) {
         printf("Waiting for a connection...\n");
         t = sizeof(client_address);
 
         /* code */
 
-
-        printf("%d\n",clientData.client[clientData.currentClient]);
-        if ((clientData.client[clientData.currentClient] = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
+            for(i=0;i<maxplayer;i++)
+            {
+                if((clientData.clientControl[i])==0){
+                    break;
+                }
+                else if(i==maxplayer-1 || clientData.clientControl[maxplayer-1]==1){
+                    //server full
+                    i=0;
+                }
+            }
+        if((clientData.client[next] = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
             perror("accept");
-
             exit(1);
         }
+
         else{
-
-            printf("%d\n",clientData.client[clientData.currentClient]);
             pthread_mutex_lock(&iMutex);
-            pthread_create(&clientData.clientThread[clientData.currentClient],NULL,&send_recv,(void *)&clientData); // (void *)clientData)
+            printf("\n\n\nAccepting %d\n",next);
 
-            if(joinQuerry){
-                pthread_mutex_lock(&iMutex);
-                pthread_join(clientData.clientThread[threadLocal],NULL);
-                clientData.clientControl[threadLocal]=0;
-                clientData.currentClient=firstFreeSlot(clientData);
-                pthread_mutex_unlock(&iMutex);
+
+            printf("1next %d & curclient %d\n",next,clientData.currentClient);
+            for(i=0;i<maxplayer;i++)
+            {
+                if((clientData.clientControl[i])==0){
+                    clientData.currentClient = i;
+                    printf("inside if \n");
+                    break;
+                }
             }
+            printf("2next %d & curclient %d\n",next,clientData.currentClient);
+            clientData.clientControl[clientData.currentClient]=1;
+            for(i=0;i<maxplayer;i++)
+            {
+                if((clientData.clientControl[i])==0){
+                    next = i;
+                    printf("inside if \n");
+                    break;
+                }
             }
 
-              //pthtread lock
+            printf("3next %d & curclient %d\n",next,clientData.currentClient);
+            printf("after %d token for client %d\n",clientData.clientControl[clientData.currentClient],clientData.currentClient);
 
-                //thread release
-
+            pthread_create(&clientData.clientThread[clientData.currentClient],NULL,&send_recv,(void *)&clientData);
             }
-
+            /*if(joinQuerry<=0){
+                pthread_join(clientData.clientThread[joinQuerry],NULL);
+                joinQuerry=-1;
+            }*/
+        }
             printf("close\n" );
     close(server);
   return 0;
 }
+
 
 
 
