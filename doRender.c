@@ -5,11 +5,13 @@
 #include "main.h"
 #include "playField.h"
 #include "gameStruct.h"
+#include "doRender.h"
 
 void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 {
   //set the drawing color to blue
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    SDL_Rect temp = {0,0,0,0};
 
     //Clear the screen (to blue)
     SDL_RenderClear(renderer);
@@ -48,29 +50,35 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
     SDL_SetRenderDrawColor(renderer, 255,255, 255, 255);
 
     //set the drawing color to white
-    SDL_Rect rect = {game->Entity.rect.x-mCam.x,game->Entity.rect.y-mCam.y, TILESIZE, TILESIZE };
+    //SDL_Rect rect = {game->Entity.rect.x-mCam.x,game->Entity.rect.y-mCam.y, TILESIZE, TILESIZE };
 
-    SDL_RenderCopy(renderer,game->gPlayerTexture.mTexture,&spriteFacing,&rect);
+    SDL_RenderCopy(renderer,game->gPlayerTexture.mTexture,&spriteFacing,getRenderPositions(game->Entity.rect, mCam, temp));
+
+
    // SDL_RenderFillRect(renderer, &rect);
 
     if(SDL_SetRenderDrawColor( renderer, 0xFF, 0x00, 0x00, 0xFF )){
         printf("Could not set render draw color for healthbar max. SDL_ERROR: %s\n", SDL_GetError());
     }
 
-    game->Entity.hpData.healthBarMax.x -=mCam.x;
-    game->Entity.hpData.healthBarMax.y -=mCam.y;
-    game->Entity.hpData.healthBarCurrent.x -=mCam.x;
-    game->Entity.hpData.healthBarCurrent.y -=mCam.y;
-
-    if(SDL_RenderFillRect( renderer, &game->Entity.hpData.healthBarMax )<0){
+    if(SDL_RenderFillRect( renderer,getRenderPositions(game->Entity.hpData.healthBarMax, mCam, temp))<0){
         printf("Couldnt render fill rect healthbar max. SDL_ERROR: %s\n", SDL_GetError());
     }
     if(SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0x00, 0xFF )){
         printf("Could not set render draw color for healthbar current. SDL_ERROR: %s\n", SDL_GetError());
     }
-    if(SDL_RenderFillRect( renderer, &game->Entity.hpData.healthBarCurrent )<0){
+    if(SDL_RenderFillRect( renderer, getRenderPositions(game->Entity.hpData.healthBarCurrent, mCam, temp))<0){
         printf("Couldnt render fill rect for healthbar current. SDL_ERROR: %s\n", SDL_GetError());
     }
 
     SDL_RenderPresent(renderer);
+}
+
+SDL_Rect *getRenderPositions(SDL_Rect entity, SDL_Rect mCam, SDL_Rect temp) {
+    temp.x = entity.x -mCam.x;
+    temp.y = entity.y -mCam.y;
+    temp.w = entity.w;
+    temp.h = entity.h;
+
+    return &temp;
 }

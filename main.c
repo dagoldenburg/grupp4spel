@@ -9,6 +9,7 @@
 #include "loadMedia.h"
 #include "processEvents.h"
 #include "collision.h"
+#include "doRender.h"
 
 
 
