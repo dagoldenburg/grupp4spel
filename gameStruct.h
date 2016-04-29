@@ -35,8 +35,6 @@ typedef struct
     SDL_Rect mBox;
 }Tile;
 
-
-
 typedef struct
 {
     Entity Entity;
@@ -44,6 +42,9 @@ typedef struct
     LTexture gPlayerTexture;
     LTexture gTileTexture;
     SDL_Rect TileClip[4];
+    SDL_Rect Source;
+    int XPOStmp;
+    int YPOStmp;
     SDL_Renderer *renderer;
 
 

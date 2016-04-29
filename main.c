@@ -17,7 +17,10 @@
 
 int main(int argc, char *argv[])
 {
-    GameState gamestate;
+    GameState gamestatePlayer;
+    GameState gamestateAI[100];
+    nrofAi;
+
     SDL_Window *window=NULL;                    // Declare a window
     SDL_Renderer *renderer=NULL;                // Declare a renderer
     SDL_Surface *starSurface=NULL;
@@ -35,26 +38,32 @@ int main(int argc, char *argv[])
                             0                                  // flags
                             );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
+    GameState tempAI;
 
     SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 
     //Player attributes
-    gamestate.Entity.rect.x=0;
-    gamestate.Entity.rect.y=0;
-    gamestate.Entity.rect.h=32;
-    gamestate.Entity.rect.w=32;
-    gamestate.Entity.mVelX=0;
-    gamestate.Entity.mVelY=0;
-    gamestate.renderer=renderer;
-    gamestate.Entity.hpData.maxHp = 100.0;
-    gamestate.Entity.hpData.currentHp = 50.0;
-    gamestate.Entity.hpData.sizeOfHealthbar = 32;
-    gamestate.Entity.hpData.healthBarCurrent.h = 8;
-    gamestate.Entity.hpData.healthBarMax.h = 8;
+    gamestatePlayer = creatyEntity(tempAI,0,0,&renderer);
+    /*gamestatePlayer.Entity.rect.x=0;
+    gamestatePlayer.Entity.rect.y=0;
+    gamestatePlayer.Entity.rect.h=32;
+    gamestatePlayer.Entity.rect.w=32;
+    gamestatePlayer.Entity.mVelX=0;
+    gamestatePlayer.Entity.mVelY=0;
+    gamestatePlayer.renderer=renderer;
+    gamestatePlayer.Entity.hpData.maxHp = 100.0;
+    gamestatePlayer.Entity.hpData.currentHp = 50.0;
+    gamestatePlayer.Entity.hpData.sizeOfHealthbar = 32;
+    gamestatePlayer.Entity.hpData.healthBarCurrent.h = 8;
+    gamestatePlayer.Entity.hpData.healthBarMax.h = 8;*/
+    for(i=0; i<rand()%20+5; i++)
+    {
+        gamestateAI[i]=createEntity(tempAI, rand()%1000, rand()%400, &renderer);
+        nrofAi++;
+    }
 
 
-    loadMedia(&gamestate);
+    loadMedia(&gamestatePlayer);
 
   // The window is open: enter program loop (see SDL_PollEvent)
 
@@ -67,10 +76,20 @@ int main(int argc, char *argv[])
     while(!done)
     {
     //Check for events
+        for(i=0; i<nrofAi; i++)
+        {
+            gamestateAI[i].XPOStmp=getAIPositionX(gamestateAI[i]);
+            gamestateAI[i].YPOStmp=getAIPositionY(gamestateAI[i]);
+        }
+        for(i=0; i<nrofAi; i++)
+        {
+            AITick(gamestateAI[i]);
+        }
 
-        done = processEvents(window, &gamestate,camera);
-        camera.x=(getmPosX(&gamestate)+ 20/2)-(SCREEN_WIDTH/2);
-        camera.y=(getmPosY(&gamestate)+20/2)-(SCREEN_HEIGHT/2);
+
+        done = processEvents(window, &gamestatePlayer,camera);
+        camera.x=(getmPosX(&gamestatePlayer)+ 20/2)-(SCREEN_WIDTH/2);
+        camera.y=(getmPosY(&gamestatePlayer)+20/2)-(SCREEN_HEIGHT/2);
         if( camera.x < 0 ){
             camera.x = 0;
         }
@@ -85,16 +104,16 @@ int main(int argc, char *argv[])
         }
 
     //Render display
-        doRender(renderer, &gamestate, camera);
+        doRender(renderer, &gamestatePlayer, camera);
 
     //don't burn up the CPU
         SDL_Delay(10);
-    }
+
 
 
   // Close and destroy the window
-    SDL_DestroyTexture(gamestate.gTileTexture.mTexture);
-    SDL_DestroyTexture(gamestate.gPlayerTexture.mTexture);
+    SDL_DestroyTexture(gamestatePlayer.gTileTexture.mTexture);
+    SDL_DestroyTexture(gamestatePlayer.gPlayerTexture.mTexture);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 

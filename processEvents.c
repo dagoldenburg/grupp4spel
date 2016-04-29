@@ -77,3 +77,48 @@ int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera)
   return done;
 
 }
+void AITick(GameState *Entity){
+
+    GameState.Entity.rect.x--;
+    return;
+}
+void whatSprite(GameState aiArray[])
+{
+    int ms = SDL_GetTicks();
+    int sprite = ms /150 %3;
+    for(int i=0; i<nrofAi; i++)
+    {
+
+                    if(getAIPositionX(aiArray[i])>aiArray[i].XPOStmp)
+                       {
+                           aiArray[i].Source.x = sprite*32;
+                           aiArray[i].Source.y = 64;
+                           aiArray[i].Source.w = 32;
+                           aiArray[i].Source.h = 32;
+
+                       }
+                    else if(getAIPositionX(aiArray[i])<aiArray[i].XPOStmp)
+                       {
+                           aiArray[i].Source.x = sprite*32;
+                           aiArray[i].Source.y = 32;
+                           aiArray[i].Source.w = 32;
+                           aiArray[i].Source.h = 32;
+                       }
+                    else if(getAIPositionY(aiArray[i])>aiArray[i].YPOStmp)
+                       {
+                           aiArray[i].Source.x = sprite*32;
+                           aiArray[i].Source.y = 0;
+                           aiArray[i].Source.w = 32;
+                           aiArray[i].Source.h = 32;
+
+                       }
+                    else if(getAIPositionY(aiArray[i])<aiArray[i].YPOStmp])
+                       {
+                           aiArray[i].Source.x = sprite*32;
+                           aiArray[i].Source.y = 96;
+                           aiArray[i].Source.w = 32;
+                           aiArray[i].Source.h = 32;
+                       }
+
+        }
+}
