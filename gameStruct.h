@@ -20,8 +20,7 @@ typedef struct {
 
 
 typedef struct
-{
-    SDL_Rect rect;
+{   SDL_Rect rect;
     int mVelX;
     int mVelY;
 

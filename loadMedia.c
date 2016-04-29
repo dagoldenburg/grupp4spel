@@ -56,7 +56,7 @@ void loadMedia(GameState *game)
 //    }
     SDL_FreeSurface( loadedSurface );
 
-    loadedSurface=IMG_Load("spriteSheet2.bmp");
+    loadedSurface=IMG_Load("spriteSheet2.png");
     if(loadedSurface==NULL)
     {
         printf("%s\n", SDL_GetError());

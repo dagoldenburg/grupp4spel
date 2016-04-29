@@ -77,16 +77,15 @@ int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera)
   return done;
 
 }
-void AITick(GameState *Entity){
-
-    GameState.Entity.rect.x--;
+void AITick(GameState *entity){
+    entity->Entity.rect.x--;
     return;
 }
-void whatSprite(GameState aiArray[])
+void whatSprite(GameState aiArray[], int nrofAI)
 {
     int ms = SDL_GetTicks();
     int sprite = ms /150 %3;
-    for(int i=0; i<nrofAi; i++)
+    for(int i=0; i<nrofAI; i++)
     {
 
                     if(getAIPositionX(aiArray[i])>aiArray[i].XPOStmp)
@@ -112,7 +111,7 @@ void whatSprite(GameState aiArray[])
                            aiArray[i].Source.h = 32;
 
                        }
-                    else if(getAIPositionY(aiArray[i])<aiArray[i].YPOStmp])
+                    else if(getAIPositionY(aiArray[i])<aiArray[i].YPOStmp)
                        {
                            aiArray[i].Source.x = sprite*32;
                            aiArray[i].Source.y = 96;

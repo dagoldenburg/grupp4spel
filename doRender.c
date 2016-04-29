@@ -71,10 +71,10 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam, GameState A
         printf("Couldnt render fill rect for healthbar current. SDL_ERROR: %s\n", SDL_GetError());
     }
 
-    for(i=0; i<nrOfAi; i++)
+    for(int i=0; i<nrOfAi; i++)
     {
             whatSprite(AIarray[i]);
-            SDL_RenderCopy( gRenderer, AIarray[i].gPlayerTexture, AIarray[i].Source, AIarray[i].Entity.rect);
+            SDL_RenderCopy(renderer, AIarray[i].gPlayerTexture.mTexture, &AIarray[i].Source, getRenderPositions(AIarray[i].Entity.rect,mCam,temp));
     }
 
     SDL_RenderPresent(renderer);
