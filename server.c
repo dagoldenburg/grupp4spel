@@ -17,15 +17,15 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 
-#define maxplayer 3
+#define maxplayer 2
 __thread int threadLocal;
 __thread int joinQuerry;
+int flag;
 //__thread char clientIp[INET_ADDRSTRLEN];
 //char clientIpAddrRecv[INET_ADDRSTRLEN];
-
+int previous;
 char str[100];
-char str2[100];
-int next;
+int next,nextExit;
 
 struct clientData
 {
@@ -87,6 +87,7 @@ static void daemonize(void)
  void* send_recv(void* clientData)
  {
     int i;
+    flag = 0;
     struct clientData *c=(struct clientData *) clientData;
     threadLocal=c->currentClient;
     pthread_mutex_unlock(&iMutex);
@@ -103,32 +104,21 @@ static void daemonize(void)
             n = recv(c->client[threadLocal], str, 100, 0);
             if (n <= 0) {
                 if (n < 0) {
-                    n = recv(c->client[threadLocal], str2, 100, 0);
-                    c->currentClient = threadLocal;
-                    printf("\n\n recv error");
-                    printf("closing:%d\n",threadLocal);
-                    if(close(c->client[threadLocal])==-1){
-
-                        printf("Connected,client = %d.\n",c->client[threadLocal]);
-                        printf("no close on:%d\n",threadLocal);
-                    }
+                    printf("recv error\n");
                 }
                 if (n == 0){
                     pthread_mutex_lock(&iMutex);
-                    joinQuerry=threadLocal;
                     c->currentClient = threadLocal;
                     printf("closing:%d\n",c->client[threadLocal]);
                     if(close(c->client[threadLocal])==-1){
-
                         printf("no close on:%d\n",threadLocal);
                     }
-                    c->clientControl[threadLocal]=0;
-                    next = threadLocal;
+                    nextExit = threadLocal;
                     printf("next i tråd: %d\n",next);
                     printf("not connected\n");
+                    flag = 1;
                     pthread_mutex_unlock(&iMutex);
                     pthread_exit(NULL);
-                    return;
                 }
                 done = 1;
                 }
@@ -137,8 +127,6 @@ static void daemonize(void)
                     perror("send");
                     done = 1;
                 }
-
-
         } while (!done);
         return;
  }
@@ -191,7 +179,9 @@ int main(char argc ,char *argv[])
 
     pthread_mutex_init(&iMutex,NULL);
     joinQuerry = -1;
-    int i;
+    int i,errorHandle;
+    char errorString[100];
+    strcpy(errorString,"Server full\n");
     next = 0;
     for(;;) {
         printf("Waiting for a connection...\n");
@@ -204,21 +194,41 @@ int main(char argc ,char *argv[])
                 if((clientData.clientControl[i])==0){
                     break;
                 }
-                else if(i==maxplayer-1 || clientData.clientControl[maxplayer-1]==1){
-                    //server full
+                else if(i==maxplayer-1){
+                printf("\nnu hamna jag i server full loopen\n");
+                    if(flag==1){
+                        next = nextExit;
+                        clientData.clientControl[nextExit]=0;
+                        break;
+                    }
+                    else{
+                        if((errorHandle = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
+                            perror("accept");
+                            exit(1);
+                        }
+                        if (send(errorHandle, errorString, sizeof(errorString), 0) < 0) {
+                            perror("send");
+                            exit(1);
+                        }
+                        if(close(errorHandle)==-1){
+                            perror("send");
+                            done = 1;
+                        }
+                    }
                     i=0;
                 }
             }
+
+            for(i=0;i<maxplayer;i++){
+                printf("sockethandler %d associated with fd %d\n",i,clientData.client[i]);
+            }
+        printf("The handle i actually accept: %d\n",next);
         if((clientData.client[next] = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
-            perror("accept");
-            exit(1);
-        }
-
-        else{
+                perror("accept");
+                exit(1);
+            }
+            else{
             pthread_mutex_lock(&iMutex);
-            printf("\n\n\nAccepting %d\n",next);
-
-
             printf("1next %d & curclient %d\n",next,clientData.currentClient);
             for(i=0;i<maxplayer;i++)
             {
@@ -228,32 +238,30 @@ int main(char argc ,char *argv[])
                     break;
                 }
             }
+
             printf("2next %d & curclient %d\n",next,clientData.currentClient);
             clientData.clientControl[clientData.currentClient]=1;
             for(i=0;i<maxplayer;i++)
-            {
-                if((clientData.clientControl[i])==0){
-                    next = i;
-                    printf("inside if \n");
-                    break;
+                {
+                    if((clientData.clientControl[i])==0){
+                        next = i;
+                        printf("inside if \n");
+                        break;
+                    }
                 }
-            }
 
             printf("3next %d & curclient %d\n",next,clientData.currentClient);
-            printf("after %d token for client %d\n",clientData.clientControl[clientData.currentClient],clientData.currentClient);
+
 
             pthread_create(&clientData.clientThread[clientData.currentClient],NULL,&send_recv,(void *)&clientData);
+            if(flag == 1){
+                clientData.clientControl[nextExit]=0;
+                flag = 0;
             }
-            /*if(joinQuerry<=0){
-                pthread_join(clientData.clientThread[joinQuerry],NULL);
-                joinQuerry=-1;
-            }*/
+            }
         }
             printf("close\n" );
     close(server);
   return 0;
 }
-
-
-
 
