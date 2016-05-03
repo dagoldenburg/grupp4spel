@@ -1,5 +1,5 @@
 #include <SDL.h>
-//#include <SDL_image.h>
+#include <SDL_image.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -10,16 +10,17 @@
 #include "processEvents.h"
 #include "collision.h"
 #include "doRender.h"
-
+#include "createEntity.h"
 
 
     SDL_Rect spriteFacing;
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     GameState gamestatePlayer;
     GameState gamestateAI[100];
-    nrofAi;
+    int nrofAi = 0;
 
     SDL_Window *window=NULL;                    // Declare a window
     SDL_Renderer *renderer=NULL;                // Declare a renderer
@@ -38,12 +39,13 @@ int main(int argc, char *argv[])
                             0                                  // flags
                             );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
+    GameState tempEntity;
 
     SDL_Rect camera = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 
     //Player attributes
-    gamestatePlayer.Entity.rect.x=0;
+    gamestatePlayer = createEntity(tempEntity,0,0,renderer);
+    /*gamestatePlayer.Entity.rect.x=0;
     gamestatePlayer.Entity.rect.y=0;
     gamestatePlayer.Entity.rect.h=32;
     gamestatePlayer.Entity.rect.w=32;
@@ -54,20 +56,14 @@ int main(int argc, char *argv[])
     gamestatePlayer.Entity.hpData.currentHp = 50.0;
     gamestatePlayer.Entity.hpData.sizeOfHealthbar = 32;
     gamestatePlayer.Entity.hpData.healthBarCurrent.h = 8;
-    gamestatePlayer.Entity.hpData.healthBarMax.h = 8;
-
-    GameState tempAI;
-
-    for(i=0; i<rand()%20+5; i++)
+    gamestatePlayer.Entity.hpData.healthBarMax.h = 8;*/
+    for(int i=0; i<rand()%20+5; i++)
     {
-        gamestateAI[i]=createEntity(tempAI, rand()%1000, rand()%400, &renderer);
+        gamestateAI[i]=createEntity(tempEntity, rand()%1000, rand()%400, renderer);
         nrofAi++;
     }
 
-
-
-
-    loadMedia(&gamestatePlayer);
+    loadMedia(&gamestatePlayer,&gamestateAI[0]);
 
   // The window is open: enter program loop (see SDL_PollEvent)
 
@@ -80,6 +76,16 @@ int main(int argc, char *argv[])
     while(!done)
     {
     //Check for events
+        for(int i=0; i<nrofAi; i++)
+        {
+            gamestateAI[i].XPOStmp=getAIPositionX(&gamestateAI[i]);
+            gamestateAI[i].YPOStmp=getAIPositionY(&gamestateAI[i]);
+        }
+
+        for(int i=0; i<nrofAi; i++)
+        {
+            AITick(&gamestateAI[i]);
+        }
 
         done = processEvents(window, &gamestatePlayer,camera);
         camera.x=(getmPosX(&gamestatePlayer)+ 20/2)-(SCREEN_WIDTH/2);
@@ -98,16 +104,17 @@ int main(int argc, char *argv[])
         }
 
     //Render display
-        doRender(renderer, &gamestatePlayer, camera);
+        doRender(renderer, &gamestatePlayer,camera,gamestateAI,nrofAi);
 
     //don't burn up the CPU
-        SDL_Delay(10);
+       SDL_Delay(10);
 
-
+    }
 
   // Close and destroy the window
     SDL_DestroyTexture(gamestatePlayer.gTileTexture.mTexture);
     SDL_DestroyTexture(gamestatePlayer.gPlayerTexture.mTexture);
+    SDL_DestroyTexture(gamestateAI->gPlayerTexture.mTexture);
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 

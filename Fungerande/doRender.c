@@ -7,7 +7,7 @@
 #include "gameStruct.h"
 #include "doRender.h"
 
-void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
+void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam, GameState AIarray[], int nrOfAi)
 {
   //set the drawing color to blue
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
@@ -69,6 +69,11 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
     }
     if(SDL_RenderFillRect( renderer, getRenderPositions(game->Entity.hpData.healthBarCurrent, mCam, temp))<0){
         printf("Couldnt render fill rect for healthbar current. SDL_ERROR: %s\n", SDL_GetError());
+    }
+    for(int i=0; i<nrOfAi; i++)
+    {
+            whatSprite(&AIarray[i]);
+            SDL_RenderCopy(renderer, AIarray[0].gPlayerTexture.mTexture, &AIarray[i].Source, getRenderPositions(AIarray[i].Entity.rect,mCam,temp));
     }
 
     SDL_RenderPresent(renderer);

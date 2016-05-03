@@ -10,6 +10,6 @@
 #include "loadMedia.h"
 #include "processEvents.h"
 
-void loadMedia(GameState *game);
+void loadMedia(GameState *game, GameState *AI);
 
 #endif // LOADMEDIA_H_INCLUDED

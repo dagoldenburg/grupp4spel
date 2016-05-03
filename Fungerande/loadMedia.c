@@ -9,14 +9,14 @@
 #include "processEvents.h"
 
 
-void loadMedia(GameState *game)
+void loadMedia(GameState *game, GameState *AI)
 {
      SDL_Surface *loadedSurface=NULL;
 
     loadedSurface=IMG_Load("tiles.png");
     if(loadedSurface==NULL)
     {
-        printf("%s\n", SDL_GetError());
+        printf("%s This is the Tiles sprite\n", SDL_GetError());
         SDL_Quit();
         exit(1);
     }
@@ -56,10 +56,10 @@ void loadMedia(GameState *game)
 //    }
     SDL_FreeSurface( loadedSurface );
 
-    loadedSurface=IMG_Load("spriteSheet2.png");
+    loadedSurface=IMG_Load("spriteSheet2.bmp");
     if(loadedSurface==NULL)
     {
-        printf("%s\n", SDL_GetError());
+        printf("%s This is the Player sprite\n", SDL_GetError());
         SDL_Quit();
         exit(1);
     }
@@ -75,6 +75,29 @@ void loadMedia(GameState *game)
     {
         game->gPlayerTexture.mWidth=loadedSurface->w;
         game->gPlayerTexture.mHeight=loadedSurface->h;
+    }
+    SDL_FreeSurface( loadedSurface );
+
+
+        loadedSurface=IMG_Load("Sprite.png");
+    if(loadedSurface==NULL)
+    {
+        printf("%s This is the AI sprite\n", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+
+    //SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xE0, 0x80, 0xC0));
+    AI->gPlayerTexture.mTexture=SDL_CreateTextureFromSurface(AI->renderer,loadedSurface);
+    if(AI->gPlayerTexture.mTexture==NULL)
+    {
+        printf( "Unable to create texture from game->gDotTexture.mTexture! SDL Error: \n",SDL_GetError());
+
+    }
+    else
+    {
+        AI->gPlayerTexture.mWidth=loadedSurface->w;
+        AI->gPlayerTexture.mHeight=loadedSurface->h;
     }
     SDL_FreeSurface( loadedSurface );
 

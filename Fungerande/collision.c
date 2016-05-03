@@ -1,47 +1,68 @@
+#include <SDL.h>
+//#include <SDL_image.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include "main.h"
+#include "playField.h"
+#include "gameStruct.h"
+#include "loadMedia.h"
+#include "processEvents.h"
+#include "player.h"
 #include "collision.h"
 
-void PlayerWallCollision(GameState *game) {
 
-	if (game->Entity.mPosX<0) { // Collision med vänstra delen av rutan
-		game->Entity.mPosX = 0;
-	}
-	if (game->Entity.mPosX + TILESIZE + PLAYER_SPEED>LEVEL_WIDTH) { // Collision med högra delen av rutan
-		game->Entity.mPosX = LEVEL_WIDTH - TILESIZE - PLAYER_SPEED;
-	}
+void PlayerWallCollision(GameState *game){
 
-	if (game->Entity.mPosY<0) { // Collision med övre delen av  rutan
-		game->Entity.mPosY = 0;
-	}
-	if (game->Entity.mPosY + TILESIZE + PLAYER_SPEED>LEVEL_HEIGHT) { // Collision med nedre delen av rutan
-		game->Entity.mPosY = LEVEL_HEIGHT - TILESIZE - PLAYER_SPEED;
-	}
+    if( game->Entity.rect.x<0 ){ // Collision med vänstra delen av rutan
+        game->Entity.rect.x=0;
+    }
+    if( game->Entity.rect.x+TILESIZE + PLAYER_SPEED>LEVEL_WIDTH ){ // Collision med högra delen av rutan
+        game->Entity.rect.x=LEVEL_WIDTH-TILESIZE - PLAYER_SPEED;
+    }
+
+    if( game->Entity.rect.y<0  ){ // Collision med övre delen av  rutan
+        game->Entity.rect.y=0;
+    }
+    if( game->Entity.rect.y+TILESIZE + PLAYER_SPEED>LEVEL_HEIGHT ){ // Collision med nedre delen av rutan
+        game->Entity.rect.y=LEVEL_HEIGHT-TILESIZE - PLAYER_SPEED;
+    }
 
 }
 
-int collisionDetection(Entity *object) {
-	for (int i = 0; i<TOTAL_COLLISION_TILES; i++) {
-		if (playfield[(object->mPosY + 5) / TILESIZE][(object->mPosX + 5) / TILESIZE] == collisionTiles[i]) //Kontrollerar om det finns ett hinder, annars flyttar objektet
-		{
-			printf("Upper box\n");
-			return 1;
-		}
-		if (playfield[(object->mPosY + TILESIZE - 5) / TILESIZE][(object->mPosX + TILESIZE - 5) / TILESIZE] == collisionTiles[i])
-		{
-			printf("Lower box\n");
-			return 1;
-		}
+/*
+Collision detection med en tile.
+Den tar reda på en objects position och delar det med tilesize och skickar
+in det i playfield arrayen på playField.c och får reda på vilken tile objectet
+befinner sig i. Om tilen är lika med värdet i arrayen collisionTiles så returnar
+det 1. Player_Speed är där för att kompensera för ändrade positionen innan funktionen kallas.
+*/
 
-		if (playfield[(object->mPosY + 5) / TILESIZE][(object->mPosX + TILESIZE - 5) / TILESIZE] == collisionTiles[i])
-		{
-			printf("Right box\n");
-			return 1;
-		}
+int collisionDetection(Entity *object){
+    int LEFT = object->rect.x;//Lättare att förstå
+    int TOP = object->rect.y;
+    int RIGHT = object->rect.x + object->rect.w;
+    int BOTTOM = object->rect.y + object->rect.h;
 
-		if (playfield[(object->mPosY + TILESIZE - 5) / TILESIZE][(object->mPosX + 5) / TILESIZE] == collisionTiles[i])
-		{
-			printf("Left box\n");
-			return 1;
-		}
-	}
-	return 0;
+    for(int i = 0; i<TOTAL_COLLISION_TILES; i++) {
+            if(playfield[(TOP + PLAYER_SPEED)/TILESIZE][(LEFT + PLAYER_SPEED)/TILESIZE]==collisionTiles[i]) //COLLISION MED ÖVRE VÄNSTER KANT
+            {
+                return 1;
+            }
+            if(playfield[(BOTTOM - PLAYER_SPEED)/TILESIZE][(RIGHT - PLAYER_SPEED)/TILESIZE]==collisionTiles[i])//COLLISION MED NEDRE HÖGER KANT
+            {
+                return 1;
+            }
+
+            if(playfield[(TOP + PLAYER_SPEED)/TILESIZE][(RIGHT - PLAYER_SPEED)/TILESIZE]==collisionTiles[i])//COLLISION MED ÖVRE HÖGER KANT
+            {
+                return 1;
+            }
+
+            if(playfield[(BOTTOM - PLAYER_SPEED)/TILESIZE][(LEFT + PLAYER_SPEED)/TILESIZE]==collisionTiles[i]) //COLLISION MED NEDRE VÄNSTER KANT
+            {
+                return 1;
+            }
+    }
+    return 0;
 }

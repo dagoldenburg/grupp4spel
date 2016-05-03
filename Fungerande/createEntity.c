@@ -1,20 +1,27 @@
-#include "SDL.h"
+#include <SDL.h>
 #include "main.h"
-#include "ai.h"
+#include "gameStruct.h"
+#include "createEntity.h"
 
-GameState creatyEntity(Gamestate *entity, int x, int y, SDL_Renderer *renderer) {
-    entity.rect.x=x;
-    entity.rect.y=y;
-    entity.rect.h=32;
-    entity.rect.w=32;
-    entity.mVelX=0;
-    entity.mVelY=0;
-    Entity.renderer=renderer;
-    entity.hpData.maxHp = 100.0;
-    entity.hpData.currentHp = 50.0;
-    entity.hpData.sizeOfHealthbar = 32;
-    entity.hpData.healthBarCurrent.h = 8;
-    entity.hpData.healthBarMax.h = 8;
+GameState createEntity(GameState entity, int x, int y, SDL_Renderer *renderer) {
+    entity.Entity.rect.x=x;
+    entity.Entity.rect.y=y;
+    entity.Entity.rect.h=32;
+    entity.Entity.rect.w=32;
+    entity.Entity.mVelX=0;
+    entity.Entity.mVelY=0;
+    entity.renderer=renderer;
+    entity.Entity.hpData.maxHp = 100.0;
+    entity.Entity.hpData.currentHp = 50.0;
+    entity.Entity.hpData.sizeOfHealthbar = 32;
+    entity.Entity.hpData.healthBarCurrent.h = 8;
+    entity.Entity.hpData.healthBarMax.h = 8;
 
     return entity;
+}
+int getAIPositionX(GameState *entity){
+    return entity->Entity.rect.x;
+}
+int getAIPositionY(GameState *entity){
+    return entity->Entity.rect.y;
 }
