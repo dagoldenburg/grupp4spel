@@ -21,11 +21,14 @@
 __thread int threadLocal;
 __thread int joinQuerry;
 int flag;
+int server;
 //__thread char clientIp[INET_ADDRSTRLEN];
 //char clientIpAddrRecv[INET_ADDRSTRLEN];
 int previous;
 char str[100];
 int next,nextExit;
+struct sockaddr_in server_address, client_address;
+int t;
 
 struct clientData
 {
@@ -84,6 +87,24 @@ static void daemonize(void)
 
 }
     int n,done;
+
+ /*void* serverFullThread(void* serverFullMsg){
+    if((errorHandle = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
+        perror("accept");
+        exit(1);
+    }
+    if (send(errorHandle, errorString, sizeof(errorString), 0) < 0) {
+        perror("send");
+        exit(1);
+    }
+    if(close(errorHandle)==-1){
+        perror("send");
+        done = 1;
+    }
+    serverFullMsg = 0;
+    pthread_exit(NULL);
+ }*/
+
  void* send_recv(void* clientData)
  {
     int i;
@@ -113,6 +134,7 @@ static void daemonize(void)
                     if(close(c->client[threadLocal])==-1){
                         printf("no close on:%d\n",threadLocal);
                     }
+                    c->clientControl[threadLocal]=0;
                     nextExit = threadLocal;
                     printf("next i tråd: %d\n",next);
                     printf("not connected\n");
@@ -134,32 +156,23 @@ static void daemonize(void)
 
 int main(char argc ,char *argv[])
 {
-    int server,t, len,portno,optval,errorhej = 0;
+    int len,portno,optval,errorhej = 0;
     socklen_t optlen = sizeof(optval);
     struct clientData clientData;
     clientData.currentClient = 0;
 
-    struct sockaddr_in server_address, client_address;
-    //char str[100];
+    int errorHandle;
+    char errorString[100];
+    strcpy(errorString,"Server full\n");
 
     if ((server = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         perror("socket");
         exit(1);
     }
-  /*  optval = 1;
-    optlen = sizeof(optval);
-    if(setsockopt(server,SOL_SOCKET,SO_KEEPALIVE,&optval,optlen)<0){
-        perror("setsockopt()");
-        close(server);
-    }*/
-    printf("Hej %d\n",errorhej++);
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr=INADDR_ANY;
     server_address.sin_port=htons(atoi(argv[1]));
     len =sizeof(server_address);
-  //strcpy(local.sun_path, SOCK_PATH);
-  //unlink(local.sun_path);
-  //len = strlen(local.sun_path) + sizeof(local.sun_family);
     if (bind(server, (struct sockaddr *)&server_address, len) == -1) {
         perror("bind");
         exit(1);
@@ -179,85 +192,83 @@ int main(char argc ,char *argv[])
 
     pthread_mutex_init(&iMutex,NULL);
     joinQuerry = -1;
-    int i,errorHandle;
-    char errorString[100];
-    strcpy(errorString,"Server full\n");
+    int i;
     next = 0;
+    int slotsAvailable = 1;
+    int serverFullMsg = 0;
+    pthread_t serverFullHandle;
     for(;;) {
         printf("Waiting for a connection...\n");
         t = sizeof(client_address);
 
-        /* code */
-
-            for(i=0;i<maxplayer;i++)
-            {
-                if((clientData.clientControl[i])==0){
-                    break;
-                }
-                else if(i==maxplayer-1){
-                printf("\nnu hamna jag i server full loopen\n");
-                    if(flag==1){
-                        next = nextExit;
-                        clientData.clientControl[nextExit]=0;
-                        break;
+        slotsAvailable=0;
+        for(i=0;i<maxplayer;i++){
+            if(clientData.clientControl[i]==0){
+                slotsAvailable=1;
+                break;
+            }
+        }
+            if(slotsAvailable==0){
+                printf("Server full\n");
+                    if((errorHandle = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
+                        perror("accept");
+                        exit(1);
                     }
-                    else{
-                        if((errorHandle = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
-                            perror("accept");
-                            exit(1);
-                        }
-                        if (send(errorHandle, errorString, sizeof(errorString), 0) < 0) {
-                            perror("send");
-                            exit(1);
-                        }
-                        if(close(errorHandle)==-1){
-                            perror("send");
-                            done = 1;
-                        }
+                    if (send(errorHandle, errorString, sizeof(errorString), 0) < 0) {
+                        perror("send");
+                        exit(1);
                     }
-                    i=0;
-                }
-            }
-
-            for(i=0;i<maxplayer;i++){
-                printf("sockethandler %d associated with fd %d\n",i,clientData.client[i]);
-            }
-        printf("The handle i actually accept: %d\n",next);
-        if((clientData.client[next] = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
-                perror("accept");
-                exit(1);
-            }
-            else{
-            pthread_mutex_lock(&iMutex);
-            printf("1next %d & curclient %d\n",next,clientData.currentClient);
-            for(i=0;i<maxplayer;i++)
-            {
-                if((clientData.clientControl[i])==0){
-                    clientData.currentClient = i;
-                    printf("inside if \n");
-                    break;
-                }
-            }
-
-            printf("2next %d & curclient %d\n",next,clientData.currentClient);
-            clientData.clientControl[clientData.currentClient]=1;
-            for(i=0;i<maxplayer;i++)
-                {
-                    if((clientData.clientControl[i])==0){
-                        next = i;
-                        printf("inside if \n");
-                        break;
+                    if(close(errorHandle)==-1){
+                        perror("send");
+                        done = 1;
+                    }
+                    for(i=0;i<maxplayer;i++)
+                    {
+                        if((clientData.clientControl[i])==0){
+                            next = i;
+                            printf("inside if \n");
+                            break;
+                        }
                     }
                 }
-
-            printf("3next %d & curclient %d\n",next,clientData.currentClient);
-
-
-            pthread_create(&clientData.clientThread[clientData.currentClient],NULL,&send_recv,(void *)&clientData);
-            if(flag == 1){
-                clientData.clientControl[nextExit]=0;
+        if(slotsAvailable==1){
+            if(flag==1){
+                next = nextExit;
                 flag = 0;
             }
+            printf("The handle i actually accept: %d\n",next);
+            if((clientData.client[next] = accept(server, (struct sockaddr *)&client_address, &t)) == -1) {
+                    perror("accept");
+                    exit(1);
+                }
+                else{
+                    pthread_mutex_lock(&iMutex);
+                    printf("1next %d & curclient %d\n",next,clientData.currentClient);
+                    for(i=0;i<maxplayer;i++)
+                    {
+                        if((clientData.clientControl[i])==0){
+                            clientData.currentClient = i;
+                            printf("inside if \n");
+                            break;
+                        }
+                    }
+                    printf("2next %d & curclient %d\n",next,clientData.currentClient);
+                    clientData.clientControl[clientData.currentClient]=1;
+                    for(i=0;i<maxplayer;i++)
+                        {
+                            if((clientData.clientControl[i])==0){
+                                next = i;
+                                printf("inside if \n");
+                                break;
+                            }
+                        }
+                    printf("3next %d & curclient %d\n",next,clientData.currentClient);
+                    pthread_create(&clientData.clientThread[clientData.currentClient],NULL,&send_recv,(void *)&clientData);
+                    if(flag == 1){
+                        next=nextExit;
+                        flag = 0;
+                    }
+                }
             }
         }
             printf("close\n" );
