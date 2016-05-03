@@ -19,8 +19,6 @@ int getmPosY(GameState *game)
     return game->Entity.rect.y;
 }
 
-
-
 int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera)
 {
     SDL_Event event;
@@ -84,7 +82,7 @@ void AITick(GameState *entity){
 void whatSprite(GameState *AI, int nrofAI)
 {
     int ms = SDL_GetTicks();
-    int sprite = ms /150 %4;
+    int sprite = ms /150 % 3+1;
     for(int i=0; i<nrofAI; i++)
     {
 

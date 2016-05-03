@@ -87,7 +87,7 @@ void loadMedia(GameState *game, GameState *AI)
         exit(1);
     }
 
-    //SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xE0, 0x80, 0xC0));
+    SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x0, 0xFF));
     AI->gPlayerTexture.mTexture=SDL_CreateTextureFromSurface(AI->renderer,loadedSurface);
     if(AI->gPlayerTexture.mTexture==NULL)
     {
