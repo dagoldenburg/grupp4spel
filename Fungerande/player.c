@@ -66,9 +66,7 @@ void ControlPlayer(GameState *game){
     }
 
     if(state[SDL_SCANCODE_SPACE]){ // Spelaren går Attackerar
-        spriteFacing.x = 32;
-        spriteFacing.y = 0;
-        game->Entity.rect.y += PLAYER_SPEED;
+        spawnAttack(&game->Entity);
         if(collisionDetection(&game->Entity)){
            game->Entity.rect.y -= PLAYER_SPEED;
         }

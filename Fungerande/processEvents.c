@@ -76,15 +76,42 @@ int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera)
 
 }
 void AITick(GameState *entity){
+
+   /* if(entity->Entity.mVelY== 33 || entity->Entity.mVelY == -32){
+        entity->Entity.mVelY = rand()%2;
+    }
+    */
     entity->Entity.rect.x--;
+    if(collisionDetection(entity)){
+        entity->Entity.rect.x++;
+
+        if(entity->Entity.mVelY >= 1) {
+            entity->Entity.rect.y--;
+            if(collisionDetection(entity) || entity->Entity.rect.y <0){
+                entity->Entity.rect.y++;
+                entity->Entity.mVelY = 0;
+            }
+        }else if(entity->Entity.mVelY <=0) {
+            entity->Entity.rect.y++;
+
+            if(collisionDetection(entity) || entity->Entity.rect.y + TILESIZE + PLAYER_SPEED>LEVEL_HEIGHT){
+                entity->Entity.rect.y--;
+                entity->Entity.mVelY = 1;
+            }
+        }
+
+
+    }
+
+
+    PlayerWallCollision(entity);
+
     return;
 }
 void whatSprite(GameState *AI, int nrofAI)
 {
     int ms = SDL_GetTicks();
     int sprite = ms /150 % 3+1;
-    for(int i=0; i<nrofAI; i++)
-    {
 
                     if(getAIPositionX(&AI)>AI->XPOStmp)
                        {
@@ -117,5 +144,5 @@ void whatSprite(GameState *AI, int nrofAI)
                            AI->Source.h = 32;
                        }
 
-        }
+
 }

@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
 
     SDL_Window *window=NULL;                    // Declare a window
     SDL_Renderer *renderer=NULL;                // Declare a renderer
-    SDL_Surface *starSurface=NULL;
 
     SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
     //srandom((int)time(NULL));
@@ -45,21 +44,11 @@ int main(int argc, char *argv[])
 
     //Player attributes
     gamestatePlayer = createEntity(tempEntity,0,0,renderer);
-    /*gamestatePlayer.Entity.rect.x=0;
-    gamestatePlayer.Entity.rect.y=0;
-    gamestatePlayer.Entity.rect.h=32;
-    gamestatePlayer.Entity.rect.w=32;
-    gamestatePlayer.Entity.mVelX=0;
-    gamestatePlayer.Entity.mVelY=0;
-    gamestatePlayer.renderer=renderer;
-    gamestatePlayer.Entity.hpData.maxHp = 100.0;
-    gamestatePlayer.Entity.hpData.currentHp = 50.0;
-    gamestatePlayer.Entity.hpData.sizeOfHealthbar = 32;
-    gamestatePlayer.Entity.hpData.healthBarCurrent.h = 8;
-    gamestatePlayer.Entity.hpData.healthBarMax.h = 8;*/
+
     for(int i=0; i<rand()%20+5; i++)
     {
-        gamestateAI[i]=createEntity(tempEntity, rand()%1000, rand()%400, renderer);
+        gamestateAI[i]=createEntity(tempEntity, 1184, rand()%1000, renderer);
+        gamestateAI[i].Entity.mVelY = rand()%2;
         nrofAi++;
     }
 
@@ -80,12 +69,9 @@ int main(int argc, char *argv[])
         {
             gamestateAI[i].XPOStmp=getAIPositionX(&gamestateAI[i]);
             gamestateAI[i].YPOStmp=getAIPositionY(&gamestateAI[i]);
-        }
-
-        for(int i=0; i<nrofAi; i++)
-        {
             AITick(&gamestateAI[i]);
         }
+
 
         done = processEvents(window, &gamestatePlayer,camera);
         camera.x=(getmPosX(&gamestatePlayer)+ 20/2)-(SCREEN_WIDTH/2);
