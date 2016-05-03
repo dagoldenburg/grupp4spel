@@ -110,8 +110,19 @@ void AITick(GameState *entity){
 }
 
 void hitAI(Entity *player, Entity *AI){
+    if(spriteFacing.x == 32 && spriteFacing.y == 32){
+        AI->rect.x -= 5;
+    }
+    if(spriteFacing.x == 0 && spriteFacing.y == 32){
+        AI->rect.x += 5;
+    }
+    if(spriteFacing.x == 0 && spriteFacing.y == 0){
+        AI->rect.y -= 5;
+    }
+    if(spriteFacing.x == 32 && spriteFacing.y == 0){
+        AI->rect.y += 5;
+    }
 
-    AI->rect.x += 10;
     player->attack.h = 0;
     player->attack.w = 0;
     player->attack.x = 0;
