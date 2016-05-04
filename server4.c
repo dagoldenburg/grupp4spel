@@ -18,7 +18,7 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 
-#define maxplayer 2
+#define maxplayer 3
 __thread int threadLocal;
 __thread int joinQuerry;
 int flag;
@@ -64,10 +64,10 @@ void* send_recv(void* clientData)
         printf("c->client[threadLocal]: %d\n",c->client[threadLocal]);
         while(!done) {
             n = recv(c->client[threadLocal],c->Data[threadLocal].buffer, 100, 0);
-
+            printf("connect to threadlocal%d",threadLocal);
             if (n <= 0) {
                 if (n < 0) {
-                    printf("recv error\n");
+                    printf("recv error %d\n",errno);
                 }
                 if (n == 0){
                     pthread_mutex_lock(&iMutex);
@@ -87,7 +87,8 @@ void* send_recv(void* clientData)
                 done = 1;
                 }else{
 
-                    sendFlag =threadLocal;
+                    c->Data[threadLocal].buffer[n] = '\0';
+                    sendFlag = 1;
                 }
 
          //   if (!done)
@@ -108,22 +109,22 @@ void* send_to_all_clients(void* clientData)
             int i,j;
             for(i=0;i<maxplayer;i++)
             {
-                if(strcmp("",c->Data[i].buffer)!=0)
+                if(c->Data[i].buffer[0]!='\0')
                 {
                     printf("buffer from client%d: %s\n",i,c->Data[i].buffer);
                     pthread_mutex_lock(&iMutex);
                     for(j=0;j<maxplayer;j++)
                     {
-
                         // todo client control check
+                        if(c->clientControl[j]==1 && (i!=j || strstr(c->Data[i].buffer,"connected")!=NULL))
+                            if(send(c->client[j],c->Data[i].buffer,sizeof(c->Data[i].buffer),0)<0)
+                            {
+                                perror("send to all clients");
 
-                        if(send(c->client[j],c->Data[i].buffer,sizeof(c->Data[i].buffer),0)<0)
-                        {
-                            perror("send to all clients");
-
-                        }
+                            }
                     }
                     sendFlag=0;
+                    c->Data[i].buffer[0]='\0';
                     pthread_mutex_unlock(&iMutex);
                 }
             }
@@ -164,7 +165,7 @@ int main(char argc ,char *argv[])
     for(a=0;a<maxplayer;a++)
     {
         clientData.clientControl[a]=0;
-      //  clientData.Data[a].sendFlag=0;
+        clientData.Data[a].buffer[0]='\0';
 
     }
 
@@ -227,7 +228,7 @@ int main(char argc ,char *argv[])
                     for(i=0;i<maxplayer;i++)
                     {
                         if((clientData.clientControl[i])==0){
-                            clientData.currentClient = i;
+                            clientData.currentClient = next;
                             printf("inside if \n");
                             break;
                         }
