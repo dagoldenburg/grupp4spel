@@ -1,7 +1,8 @@
 //	Under Construction	\\
 //	Testing: Not done	\\
-//---
-
+//	
+// Det här är vår backup om UNIX server/client programmet skulle
+// krångla och vi skulle bli tvungna att hoppa till en SDL2_net server/client.
 /*
 gcc server.c -o server -L./ -lSDL2main -lSDL2 -lSDL2_net
 */
