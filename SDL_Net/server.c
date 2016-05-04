@@ -75,17 +75,15 @@ int main(int argc, char *argv[])
 			}
 			
 			printf("%s\n", packet.data);
+			free(packet.data);
 			
-			
-		} //if(SDLNet_SocketReady(server_socket)) {
-		
-		
-		
-		
-	}// for(;;) {
+		}
+	}
+	// BeFrIa socket_set OcH server_socket(fIlDeSkRiPtOr)
+	SDLNet_FreeSocketSet(socket_set);
+	SDLNet_UDP_Close(server_socket);
 	
-	
-	
+	return 0;
 }
 
   
