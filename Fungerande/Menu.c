@@ -4,11 +4,11 @@
 void startMenu(SDL_Renderer *renderer)
 {
    int mX,mY,quit=0;
-   SDL_Surface *loadedSurface = IMG_Load("Menu.png");
+   SDL_Surface *loadedSurface = IMG_Load("PixelMenu.png");
    SDL_Event event;
     if(loadedSurface==NULL)
     {
-        printf("%s This is the Menu\n", SDL_GetError());
+        printf("%s\n", SDL_GetError());
         SDL_Quit();
         exit(1);
     }
@@ -37,15 +37,15 @@ void startMenu(SDL_Renderer *renderer)
               SDL_Quit;
               exit(1);
             }
-           else if(event.type == SDL_MOUSEBUTTONDOWN && (mX>400 && mX<1010))
+           else if(event.type == SDL_MOUSEBUTTONDOWN && (mX>560 && mX<715))
             {
                 if(event.button.button == SDL_BUTTON_LEFT)
                 {
-                    if(mY>120 && mY<255)
+                    if(mY>300 && mY<325)
                     {
                         quit=1;
                     }
-                    else if(mY>320 && mY<455)
+                    else if(mY>420 && mY<470)
                     {
                         SDL_Quit();
                         exit(1);
@@ -56,6 +56,8 @@ void startMenu(SDL_Renderer *renderer)
         }
         SDL_RenderPresent(renderer);
    }
+
         SDL_FreeSurface(loadedSurface);
+        SDL_DestroyTexture(menuTexture);
 return;
 }
