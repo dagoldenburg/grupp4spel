@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     GameState gamestatePlayer;
     GameState gamestateAI[100];
     int nrofAi = 0;
+    long ticks = 0;
 
     SDL_Window *window=NULL;                    // Declare a window
     SDL_Renderer *renderer=NULL;                // Declare a renderer
@@ -50,6 +51,7 @@ int main(int argc, char *argv[])
     {
         gamestateAI[i]=createEntity(tempEntity, 1184, rand()%1000, renderer);
         gamestateAI[i].Entity.mVelY = rand()%2;
+        gamestateAI[i].id = nrofAi;
         nrofAi++;
     }
 
@@ -72,13 +74,17 @@ int main(int argc, char *argv[])
             gamestateAI[i].YPOStmp=getAIPositionY(&gamestateAI[i]);
             AITick(&gamestateAI[i]);
 
-            if(attackCollision(&gamestatePlayer.Entity, &gamestateAI[i])){
-                hitAI(&gamestatePlayer.Entity, &gamestateAI[i]);
+            if(attackCollision(&gamestatePlayer.Entity, &gamestateAI[i].Entity)){//Kollar om spelarens attack kolliderar med AIn
+                if(hitAI(&gamestatePlayer.Entity, &gamestateAI[i])){//Om kolliderat sänk hpen, om den har dött händer raderna nedan
+                    sortAIArray(&gamestateAI, i, nrofAi);
+                    i--;
+                    nrofAi--;
+                }
             }
         }
 
 
-        done = processEvents(window, &gamestatePlayer,camera);
+        done = processEvents(window, &gamestatePlayer,camera, ticks);
         camera.x=(getmPosX(&gamestatePlayer)+ 20/2)-(SCREEN_WIDTH/2);
         camera.y=(getmPosY(&gamestatePlayer)+20/2)-(SCREEN_HEIGHT/2);
         if( camera.x < 0 ){
@@ -99,6 +105,7 @@ int main(int argc, char *argv[])
 
     //don't burn up the CPU
        SDL_Delay(10);
+       ticks++;
 
     }
 

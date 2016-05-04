@@ -12,7 +12,7 @@ GameState createEntity(GameState entity, int x, int y, SDL_Renderer *renderer) {
     entity.Entity.mVelY=0;
     entity.renderer=renderer;
     entity.Entity.hpData.maxHp = 100.0;
-    entity.Entity.hpData.currentHp = 50.0;
+    entity.Entity.hpData.currentHp = 100.0;
     entity.Entity.hpData.sizeOfHealthbar = 32;
     entity.Entity.hpData.healthBarCurrent.h = 8;
     entity.Entity.hpData.healthBarMax.h = 8;
@@ -20,6 +20,7 @@ GameState createEntity(GameState entity, int x, int y, SDL_Renderer *renderer) {
     entity.Entity.attack.w = 0;
     entity.Entity.attack.x = 0;
     entity.Entity.attack.y = 0;
+    entity.Entity.attackCD = 0;
 
     return entity;
 }
@@ -28,4 +29,13 @@ int getAIPositionX(GameState *entity){
 }
 int getAIPositionY(GameState *entity){
     return entity->Entity.rect.y;
+}
+
+void sortAIArray(GameState *AIArray, int n, int noOfAI) {
+    for(int i = n; i<noOfAI-1;i++){
+        AIArray[i+1].gPlayerTexture = AIArray[i].gPlayerTexture;
+        AIArray[i] = AIArray[i+1];
+
+
+    }
 }

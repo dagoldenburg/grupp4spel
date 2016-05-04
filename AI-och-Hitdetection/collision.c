@@ -75,18 +75,17 @@ int attackCollision(Entity *player, Entity *AI){
 
     if(player->attack.x + player->attack.w>= AI->rect.x && player->attack.x + player->attack.w <= AI->rect.x + AI->rect.w &&
        player->attack.y >= AI->rect.y && player->attack.y <= AI->rect.y + AI->rect.h){
-        return 2;
+        return 1;
     }
 
     if(player->attack.x >= AI->rect.x && player->attack.x <= AI->rect.x + AI->rect.w &&
        player->attack.y + player->attack.h>= AI->rect.y && player->attack.y + player->attack.h <= AI->rect.y + AI->rect.h){
-        return 3;
+        return 1;
     }
 
     if(player->attack.x + player->attack.w>= AI->rect.x && player->attack.x + player->attack.w <= AI->rect.x + AI->rect.w &&
        player->attack.y + player->attack.h>= AI->rect.y && player->attack.y + player->attack.h <= AI->rect.y + AI->rect.h){
-                   printf("Top");
-        return 4;
+        return 1;
     }
 
     return 0;

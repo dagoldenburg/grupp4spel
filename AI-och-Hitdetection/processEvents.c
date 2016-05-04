@@ -19,7 +19,7 @@ int getmPosY(GameState *game)
     return game->Entity.rect.y;
 }
 
-int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera)
+int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera, long ticks)
 {
     SDL_Event event;
     int done = 0;
@@ -55,7 +55,7 @@ int processEvents(SDL_Window *window, GameState *game,SDL_Rect camera)
           break;
         }
     }
-    ControlPlayer(game);
+    ControlPlayer(game, ticks);
     PlayerWallCollision(game);
 
     if(lastHpTick!= game->Entity.hpData.currentHp)
@@ -109,24 +109,47 @@ void AITick(GameState *entity){
     return;
 }
 
-void hitAI(Entity *player, Entity *AI){
+int hitAI(Entity *player, Entity *AI){
     if(spriteFacing.x == 32 && spriteFacing.y == 32){
         AI->rect.x -= 5;
+        if(collisionDetection(AI)){
+            AI->rect.x += 5;
+        }
     }
     if(spriteFacing.x == 0 && spriteFacing.y == 32){
-        AI->rect.x += 5;
+        AI->rect.x += 10;
+        if(collisionDetection(AI)){
+            AI->rect.x -= 5;
+        }
     }
     if(spriteFacing.x == 0 && spriteFacing.y == 0){
         AI->rect.y -= 5;
+        if(collisionDetection(AI)){
+            AI->rect.y += 5;
+        }
+
     }
     if(spriteFacing.x == 32 && spriteFacing.y == 0){
         AI->rect.y += 5;
+        if(collisionDetection(AI)){
+            AI->rect.y -= 5;
+        }
     }
 
-    player->attack.h = 0;
-    player->attack.w = 0;
-    player->attack.x = 0;
-    player->attack.y = 0;
+    resetAttack(player);
+    if((AI->hpData.currentHp -= player->strength) <0) {
+        return 1;
+    }
+
+    return 0;
+
+}
+
+void resetAttack(Entity *entity){
+    entity->attack.h = 0;
+    entity->attack.w = 0;
+    entity->attack.x = 0;
+    entity->attack.y = 0;
 }
 
 void whatSprite(GameState *AI, int nrofAI)

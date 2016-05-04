@@ -29,7 +29,7 @@ void spawnAttack(Entity *player) {
 }
 
 
-void ControlPlayer(GameState *game){
+void ControlPlayer(GameState *game, long ticks){
     const Uint8 *state = SDL_GetKeyboardState(NULL); //Flyttar på spelaren om det inte finns hinder(Collision detection)
 
     if(state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_A]){ // Spelaren går till vänster
@@ -69,10 +69,14 @@ void ControlPlayer(GameState *game){
     }
 
     if(state[SDL_SCANCODE_SPACE]){ // Spelaren går Attackerar
-        spawnAttack(&game->Entity);
-        if(collisionDetection(&game->Entity)){
-           game->Entity.rect.y -= PLAYER_SPEED;
+        if(game->Entity.attackCD == 0 || (ticks - game->Entity.attackCD) >10){
+            spawnAttack(&game->Entity);
+            if(collisionDetection(&game->Entity)){
+               game->Entity.rect.y -= PLAYER_SPEED;
+            }
+            game->Entity.attackCD = ticks;
         }
+
     }
 }
 

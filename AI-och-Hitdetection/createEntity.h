@@ -3,5 +3,6 @@
 GameState createEntity(GameState entity, int x, int y, SDL_Renderer *renderer);
 int getAIPositionX(GameState *entity);
 int getAIPositionY(GameState *entity);
+void sortAIArray(GameState AIArray[], int n, int noOfAI);
 
 #endif // CREATEENTITY_H_INCLUDED

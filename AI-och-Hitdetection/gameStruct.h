@@ -24,6 +24,7 @@ typedef struct
     int mVelX;
     int mVelY;
     int strength;
+    long attackCD;
 
     SDL_Rect attack;
     HitPointData hpData;
@@ -46,7 +47,7 @@ typedef struct
     int XPOStmp;
     int YPOStmp;
     SDL_Renderer *renderer;
-
+    int id;
 
 }GameState;
 
