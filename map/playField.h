@@ -1,0 +1,12 @@
+#ifndef PLAYFIELD_H_INCLUDED
+#define PLAYFIELD_H_INCLUDED
+
+#ifndef PLAYFILED_H_INCLUDED
+#define PLAYFILED_H_INCLUDED
+#include "main.h"
+int playfield[COLUMNS][ROWS];
+int collisionTiles[TOTAL_COLLISION_TILES];
+#endif // PLAYFILED_H_INCLUDED
+
+
+#endif // PLAYFIELD_H_INCLUDED
