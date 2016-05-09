@@ -2,7 +2,7 @@
 
 #include "gameGraphics.h"
 #include "gameStruct.h"
-#include "playFiled.h"
+#include "playField.h"
 #include "main.h"
 void loadMedia(GameState *game)
 {
@@ -98,16 +98,16 @@ void loadMedia(GameState *game)
     }
     SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x0, 0xFF));
 
-    game->AiEntity.object.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
-    if(game->AiEntity.object.mTexture==NULL)
+    game->AiEntity[0].object.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
+    if(game->AiEntity[0].object.mTexture==NULL)
     {
         printf( "Unable to create texture from game->AiEntity.object.mTexture! SDL Error: \n");
 
     }
     else
     {
-        game->AiEntity.object.mWidth=loadedSurface->w;
-        game->AiEntity.object.mHeight=loadedSurface->h;
+        game->AiEntity[0].object.mWidth=loadedSurface->w;
+        game->AiEntity[0].object.mHeight=loadedSurface->h;
     }
     SDL_FreeSurface( loadedSurface );
 
@@ -116,6 +116,8 @@ void loadMedia(GameState *game)
 
 void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 {
+
+
   //set the drawing color to blue
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 
@@ -166,9 +168,13 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 //    SDL_Rect AIrect = {game->AiEntity.mPosX-mCam.x,game->AiEntity.mPosY-mCam.y, 32, 32 };
 //    SDL_RenderCopy(renderer,game->AiEntity.object.mTexture,&game->AiEntity.SpriteFacing,&AIrect);
    // SDL_RenderFillRect(renderer, &rect);
-    whatSprite(&game->AiEntity);
-    SDL_RenderCopy(renderer,game->AiEntity.object.mTexture,&game->AiEntity.spriteFacing,getRenderPosition(game->AiEntity.object.rect,mCam,tmp));
-    SDL_RenderPresent(renderer);
+   for(int i=0;i<game->nrOfAi;i++)
+   {
+       whatSprite(&game->AiEntity[i]);
+        SDL_RenderCopy(renderer,game->AiEntity[0].object.mTexture,&game->AiEntity[i].spriteFacing,getRenderPosition(game->AiEntity[i].object.rect,mCam,tmp));
+   }
+        SDL_RenderPresent(renderer);
+
 }
     SDL_Rect *getRenderPosition(SDL_Rect entity,SDL_Rect mCam,SDL_Rect temp)
     {

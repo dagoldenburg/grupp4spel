@@ -36,11 +36,11 @@ typedef struct
 {
     SDL_Rect TileClip[4]; ///MAP OBJECT
     gameObject gTileTexture;
-
     //////////////////////////////////
     Entity playerEntity[6];    /// PLAYER OBJECT
 
-    Entity AiEntity;
+    Entity AiEntity[100];
+    int nrOfAi;
     int socket;
     SDL_Renderer *renderer;
 

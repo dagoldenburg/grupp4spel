@@ -2,7 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include "gameStruct.h"
 #include "main.h"
-#include "playFiled.h"
+#include "playField.h"
 #include "gameAction.h"
 #include "gameObject.h"
 int getmPosX(Entity *entity)

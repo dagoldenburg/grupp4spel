@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer=NULL;                // Declare a renderer
     Entity tempEntity;
 
+
+
     SDL_Init(SDL_INIT_EVERYTHING);              // Initialize SDL2
     //srandom((int)time(NULL));
 
@@ -50,11 +52,14 @@ int main(int argc, char *argv[])
 
     gamestate.playerEntity[0]= createEntity(&tempEntity,0,0);/// init mainplayers data
     gamestate.playerEntity[1]= createEntity(&tempEntity,50,50);///init other co-players dat
-
-    gamestate.AiEntity=createEntity(&tempEntity, 600,rand()%800);
-    gamestate.AiEntity.mVelY=rand()%2;
-    gamestate.AiEntity.id=1; /// test one AI change to ofnrofAI
-
+    gamestate.nrOfAi=0;
+    for(int i =0;i<rand()%20+5;i++)
+    {
+        gamestate.AiEntity[i]=createEntity(&tempEntity, 600,rand()%800);
+        gamestate.AiEntity[i].mVelY=rand()%2;
+        gamestate.AiEntity[i].id=i; /// test one AI change to ofnrofAI
+        gamestate.nrOfAi++;
+    }
 
 
     loadMedia(&gamestate); ///load images to textures
@@ -65,6 +70,7 @@ int main(int argc, char *argv[])
     /**Event loop*/
     int done = 0;
 
+
   //Event loop
     while(!done) ///main game loop
     {
@@ -74,10 +80,12 @@ int main(int argc, char *argv[])
 
         gamestate.playerEntity[1].mPosX=getAIPositionX(&gamestate.playerEntity[1]); /// get laat coplayers position
         gamestate.playerEntity[1].mPosY=getAIPositionY(&gamestate.playerEntity[1]);
-
-         gamestate.AiEntity.mPosX=getAIPositionX(&gamestate.AiEntity); ///AI data
-         gamestate.AiEntity.mPosY=getAIPositionY(&gamestate.AiEntity);
-        AITTick(&gamestate.AiEntity); /// AI changes position and checks collision
+        for(int i=0;i<gamestate.nrOfAi;i++)
+        {
+            gamestate.AiEntity[i].mPosX=getAIPositionX(&gamestate.AiEntity[i]); ///AI data
+            gamestate.AiEntity[i].mPosY=getAIPositionY(&gamestate.AiEntity[i]);
+            AITTick(&gamestate.AiEntity[i]); /// AI changes position and checks collision
+        }
         done = processEvents(window, &gamestate);
 
         cameraScene.x=(getmPosX(&gamestate.playerEntity[0])+ 20/2)-SCREEN_WIDTH/2;
@@ -124,9 +132,11 @@ int main(int argc, char *argv[])
   // Close and destroy the window
     SDL_DestroyTexture(gamestate.gTileTexture.mTexture);
 
+
+    SDL_DestroyTexture(gamestate.AiEntity[0].object.mTexture);
+
     SDL_DestroyTexture(gamestate.playerEntity[0].object.mTexture); ///clear Textures
     SDL_DestroyTexture(gamestate.playerEntity[1].object.mTexture);
-    SDL_DestroyTexture(gamestate.AiEntity.object.mTexture);
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
