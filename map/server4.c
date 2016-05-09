@@ -180,7 +180,7 @@ void* aiSpawner(void *clientData){ //thread
 
     struct clientData *c=(struct clientData *) clientData;
     int i;
-    arrayOfAisToken[500]; // För att se om det finns lediga AI slots
+    int arrayOfAisToken[500]; // För att se om det finns lediga AI slots
     // TODO se till att man inte spawnar på en upptagen plats
     time_t currentTime, lastTime=0;
     char *posStringX[5]={"0090","0032","1000","0032","0404"};
@@ -192,7 +192,7 @@ void* aiSpawner(void *clientData){ //thread
         if(currentTime>lastTime+5){
             lastTime = currentTime;
                 for(i=0;i<5;i++)
-                    spawnAi(c,posStringX[i],posStringY[i]);
+                    spawnAi(c,posStringX[i],posStringY[i],arrayOfAisToken);
         }
     }
 }
