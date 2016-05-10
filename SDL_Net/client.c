@@ -121,11 +121,27 @@ int TCP_socket_connection()
 			recvBuffer[t] = '\0';
 		}
 
-
-
+		if (strstr(recvBuffer, "Server full\n")) {
+			if (counter == 0) {
+				counter++;
+				SDLNet_TCP_Close(TCP_SOCKET);
+			}
+			else if (counter == 1) {
+				printf("Server full, disconnecting.\n");
+				SDLNet_TCP_Close(TCP_SOCKET);
+				return 0;
+			} 
+		}
+		else {
+			break;
+		}
 	} // While
 
+	// Ska göras om till SDL_NET
+	/*
+	pthread_create(&recvThread,NULL,recvfunc,(void *)&s); <----- Ska ändras
 
-
-
+    	SDLNet_TCP_Close(TCP_SOCKET);
+	return TCP_SOCKET;
+	*/
 }
