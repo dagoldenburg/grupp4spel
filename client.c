@@ -11,10 +11,11 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#include <pthread.h>
 #define BUFFSIZE 4096
 #define SOCK_PATH "/tmp/socket"
 #define SERV_PORT 3232
+void *recvfunc(void *sock);
 
 int main(int argc ,char *argv[])
 {
@@ -63,24 +64,43 @@ if (connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
             return 0;
         }
     }
+    pthread_t recvThread;
+    pthread_create(&recvThread,NULL,recvfunc,(void *)&s);
+
 	while(printf("> "), fgets(str, 100, stdin), !feof(stdin)) {
         if (send(s, str, strlen(str), 0) == -1) {
             perror("send");
             exit(1);
         }
-        if ((t=recv(s, str, 100, 0)) > 0) {
-            str[t] = '\0';
-            printf("echo> %s", str);
+//        if ((t=recv(s, str, 100, 0)) > 0) {
+//            str[t] = '\0';
+//            printf("echo> %s", str);
+//
+//        } else {
+//            if (t <= 0) perror("recv");
+//            else printf("Server closed connection\n");
+//            exit(1);
+//        }
+    }
+    close(s);
+  return 0;
+}
+
+void *recvfunc(void *sock)
+{
+    int s = *(int*) sock;
+    int t;
+    char buffer[100];
+        if ((t=recv(s, buffer, 100, 0)) > 0) {
+            buffer[t] = '\0';
+
+            printf("echo> %s", buffer);
 
         } else {
             if (t <= 0) perror("recv");
             else printf("Server closed connection\n");
             exit(1);
         }
-    }
-    close(s);
-  return 0;
+
 }
-
-
 

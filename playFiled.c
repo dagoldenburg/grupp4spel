@@ -1,5 +1,5 @@
 #include "main.h"
-int playfield[COLUMNS][ROWS]=
+int playfield[12][16]=
 {
     2,0,2,0,1,2,0,1,2,0,1,2,0,1,2,0,
     0,2,3,3,3,3,3,3,3,3,3,3,3,3,3,1,

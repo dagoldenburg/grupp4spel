@@ -1,13 +1,15 @@
 #ifndef GAMESTRUCT_H_INCLUDED
 #define GAMESTRUCT_H_INCLUDED
-
+#include "SDL2/SDL.h"
+#include <SDL2/SDL_image.h>
 typedef struct
 {
     int mWidth;
     int mHeight;
+    SDL_Rect rect;
     SDL_Texture* mTexture;
 
-}LTexture;
+}gameObject;
 
 typedef struct {
     int sizeOfHealthbar;
@@ -17,37 +19,34 @@ typedef struct {
     SDL_Rect healthBarMax;
 } HitPointData;
 
-
-
 typedef struct
-{   SDL_Rect rect;
+{
+    gameObject object;
+    HitPointData hpData;
+    SDL_Rect spriteFacing;
+    int mPosX;
+    int mPosY;
     int mVelX;
     int mVelY;
+    int id;
 
-    SDL_Rect attack;
-    HitPointData hpData;
 }Entity;
 
 typedef struct
 {
-    int mtype;
-    SDL_Rect mBox;
-}Tile;
+    SDL_Rect TileClip[4]; ///MAP OBJECT
+    gameObject gTileTexture;
+    //////////////////////////////////
+    Entity playerEntity[6];    /// PLAYER OBJECT
 
-typedef struct
-{
-    Entity Entity;
-    Tile tileSet[TOTAL_TILES];
-    LTexture gPlayerTexture;
-    LTexture gTileTexture;
-    SDL_Rect TileClip[4];
-    SDL_Rect Source;
-    int XPOStmp;
-    int YPOStmp;
+    Entity AiEntity[100];
+    int aiEntityToken[100];
+    int nrOfAi;
+    int socket;
     SDL_Renderer *renderer;
-
+    SDL_Texture* mAiTexture;
+    SDL_Texture* mPlayerTexture;
 
 }GameState;
 
-
-#endif // GAMESTRUCT_H_INCLUDED
+#endif /// GAMESTRUCT_H_INCLUDED
