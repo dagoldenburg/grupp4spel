@@ -30,10 +30,10 @@
 
 void *recvfunc(void *sock)
 {
-	int s = sock;	//int s = *(int*)sock;
+	TCPsocket sock=(TCPsocket)Sock;
 	int t;
 	while (1) {
-		if ((SDLNet_TCP_Recv(s, recvbuffer, 100)) > 0) {
+		if ((SDLNet_TCP_Recv(sock, recvbuffer, 100)) > 0) {
 			recvbuffer[t] = '\0';
 			//  sscanf(buffer"%d %d",)
 			printf("> %s", recvbuffer);
