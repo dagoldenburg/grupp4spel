@@ -1,7 +1,5 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_net.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -23,10 +21,10 @@
 int main(int argc, char *argv[])
 {
     char tmp[100];
-    //pthread_t recvThread;
+    pthread_t recvThread;
     srand(time(NULL));
     GameState gamestate;
-   // gamestate.socket=TCP_socket_connection();
+    gamestate.socket=TCP_socket_connection();
     SDL_Window *window=NULL;                    // Declare a window
     SDL_Renderer *renderer=NULL;                // Declare a renderer
     Entity tempEntity;
@@ -53,24 +51,23 @@ int main(int argc, char *argv[])
     gamestate.playerEntity[0]= createEntity(&tempEntity,0,0);/// init mainplayers data
     gamestate.playerEntity[1]= createEntity(&tempEntity,50,50);///init other co-players dat
     gamestate.nrOfAi=0;
-    for(int i =0;i<rand()%20+5;i++)
+   /* for(int i =0;i<rand()%20+5;i++)
     {
         gamestate.AiEntity[i]=createEntity(&tempEntity, 600,rand()%800);
         gamestate.AiEntity[i].mVelY=rand()%2;
         gamestate.AiEntity[i].id=i; /// test one AI change to ofnrofAI
         gamestate.nrOfAi++;
-    }
+    }*/
 
 
     loadMedia(&gamestate); ///load images to textures
 
   // The window is open: enter program loop (see SDL_PollEvent)
 
-
     /**Event loop*/
     int done = 0;
 
-
+    pthread_create(&recvThread,NULL,recvfunc,(void *)&gamestate);
   //Event loop
     while(!done) ///main game loop
     {
@@ -80,12 +77,14 @@ int main(int argc, char *argv[])
 
         gamestate.playerEntity[1].mPosX=getAIPositionX(&gamestate.playerEntity[1]); /// get laat coplayers position
         gamestate.playerEntity[1].mPosY=getAIPositionY(&gamestate.playerEntity[1]);
-        for(int i=0;i<gamestate.nrOfAi;i++)
+
+        for(int i=0;i<highestId;i++)
         {
             gamestate.AiEntity[i].mPosX=getAIPositionX(&gamestate.AiEntity[i]); ///AI data
             gamestate.AiEntity[i].mPosY=getAIPositionY(&gamestate.AiEntity[i]);
             AITTick(&gamestate.AiEntity[i]); /// AI changes position and checks collision
         }
+
         done = processEvents(window, &gamestate);
 
         cameraScene.x=(getmPosX(&gamestate.playerEntity[0])+ 20/2)-SCREEN_WIDTH/2;
@@ -112,26 +111,21 @@ int main(int argc, char *argv[])
         doRender(renderer, &gamestate,cameraScene); /// renderer Ai , players and  map
 
     //don't burn up the CPU
-        SDL_Delay(10);
+        //SDL_Delay(10);
        ///***************if players position x,y changes -> send to server***********///
-//        if(getmPosX(&gamestate.playerEntity[0])>gamestate.playerEntity[0].mPosX || getmPosY(&gamestate.playerEntity[0])>gamestate.playerEntity[0].mPosY)
-//        {
-//            sprintf(tmp,"%d %d",getmPosX(&gamestate.playerEntity[0]),getmPosY(&gamestate.playerEntity[0]));
-//            if (send(gamestate.socket, tmp, strlen(tmp), 0) == -1)
-//            {
-//                perror("send");
-//                exit(1);
-//            }
-//        }
-//
-//        printf(".......................................from server %s\n",recvbuffer);///recv thread from other clients
-      //  pthread_create(&recvThread,NULL,recvfunc,(void *)&gamestate.socket);
+        if(getmPosX(&gamestate.playerEntity[0])!=gamestate.playerEntity[0].mPosX || getmPosY(&gamestate.playerEntity[0])!=gamestate.playerEntity[0].mPosY)
+        {
+            sprintf(tmp,"%d %d",getmPosX(&gamestate.playerEntity[0]),getmPosY(&gamestate.playerEntity[0]));
+            if (send(gamestate.socket, tmp, strlen(tmp), 0) == -1)
+            {
+                perror("send");
+                exit(1);
+            }
+        }
+       // printf("from server %s\n",recvbuffer);///recv thread from other clients
     }
-
-
   // Close and destroy the window
     SDL_DestroyTexture(gamestate.gTileTexture.mTexture);
-
 
     SDL_DestroyTexture(gamestate.AiEntity[0].object.mTexture);
 

@@ -43,6 +43,8 @@ typedef struct
     int nrOfAi;
     int socket;
     SDL_Renderer *renderer;
+    SDL_Texture* mAiTexture;
+    SDL_Texture* mPlayerTexture;
 
 }GameState;
 

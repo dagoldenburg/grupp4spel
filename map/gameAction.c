@@ -156,8 +156,8 @@ int processEvents(SDL_Window *window, GameState *game)
 
     controlplayer(&game->playerEntity[0]);
     coPlayerControll(&game->playerEntity[1]);
-    printf("camera: %d\n",game->playerEntity[0].object.rect.x );
-    printf("man: %d\n",game->playerEntity[0].object.rect.y );
+    //printf("camera: %d\n",game->playerEntity[0].object.rect.x );
+    //printf("man: %d\n",game->playerEntity[0].object.rect.y );
 
   return done;
 

@@ -3,9 +3,11 @@
 #include "gameGraphics.h"
 #include "gameStruct.h"
 #include "playField.h"
+#include "gameNet.h"
 #include "main.h"
 void loadMedia(GameState *game)
 {
+    int i;
      SDL_Surface *loadedSurface=NULL;
 
         ///****************************MAP-Textures****************************///
@@ -52,41 +54,14 @@ void loadMedia(GameState *game)
     }
     SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x0, 0xFF));
 
-    game->playerEntity[0].object.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
-    if(game->playerEntity[0].object.mTexture==NULL)
+    game->mPlayerTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
+    if(game->mPlayerTexture==NULL)
     {
         printf( "Unable to create texture from game->playerEntity.object.mTexture! SDL Error: \n");
 
     }
-    else
-    {
-        game->playerEntity[0].object.mWidth=loadedSurface->w;
-        game->playerEntity[0].object.mHeight=loadedSurface->h;
-    }
     SDL_FreeSurface( loadedSurface );
-    ///**************************************CO-PLayer Texture*******************************///
-    loadedSurface=IMG_Load("textures/player1.png");
-    if(loadedSurface==NULL)
-    {
-        printf("Cannot find tiles textures/player1.png\n\n");
-        SDL_Quit();
-        exit(1);
 
-    }
-    SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x0, 0xFF));
-
-    game->playerEntity[1].object.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
-    if(game->playerEntity[1].object.mTexture==NULL)
-    {
-        printf( "Unable to create texture from game->playerEntity.object.mTexture! SDL Error: \n");
-
-    }
-    else
-    {
-        game->playerEntity[1].object.mWidth=loadedSurface->w;
-        game->playerEntity[1].object.mHeight=loadedSurface->h;
-    }
-    SDL_FreeSurface( loadedSurface );
     ///*****************************************AI texture********************************///
     loadedSurface=IMG_Load("textures/player1.png");
     if(loadedSurface==NULL)
@@ -97,22 +72,15 @@ void loadMedia(GameState *game)
 
     }
     SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x0, 0xFF));
+        game->mAiTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
+        if(game->mAiTexture==NULL)
+        {
+            printf( "Unable to create texture from game->AiEntity.object.mTexture! SDL Error: \n");
 
-    game->AiEntity[0].object.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
-    if(game->AiEntity[0].object.mTexture==NULL)
-    {
-        printf( "Unable to create texture from game->AiEntity.object.mTexture! SDL Error: \n");
-
-    }
-    else
-    {
-        game->AiEntity[0].object.mWidth=loadedSurface->w;
-        game->AiEntity[0].object.mHeight=loadedSurface->h;
-    }
+        }
     SDL_FreeSurface( loadedSurface );
 
 }
-
 
 void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 {
@@ -151,8 +119,6 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 
     }
 
-
-
 //
 //    SDL_Rect camera={0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 //    SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&mCam,&camera);
@@ -161,17 +127,16 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
         SDL_Rect tmp;
     //set the drawing color to white
    // SDL_Rect rect = {game->playerEntity.mPosX-mCam.x,game->playerEntity.mPosY-mCam.y, 32, 32 };
-    SDL_RenderCopy(renderer,game->playerEntity[0].object.mTexture,&game->playerEntity[0].spriteFacing,getRenderPosition(game->playerEntity[0].object.rect,mCam,tmp));
-
-    SDL_RenderCopy(renderer,game->playerEntity[1].object.mTexture,&game->playerEntity[1].spriteFacing,getRenderPosition(game->playerEntity[1].object.rect,mCam,tmp));
+    for(i=0;i<5;i++)
+        SDL_RenderCopy(renderer,game->mPlayerTexture,&game->playerEntity[i].spriteFacing,getRenderPosition(game->playerEntity[i].object.rect,mCam,tmp));
 
 //    SDL_Rect AIrect = {game->AiEntity.mPosX-mCam.x,game->AiEntity.mPosY-mCam.y, 32, 32 };
 //    SDL_RenderCopy(renderer,game->AiEntity.object.mTexture,&game->AiEntity.SpriteFacing,&AIrect);
    // SDL_RenderFillRect(renderer, &rect);
-   for(int i=0;i<game->nrOfAi;i++)
+   for(int i=0;i<highestId;i++)
    {
-       whatSprite(&game->AiEntity[i]);
-        SDL_RenderCopy(renderer,game->AiEntity[0].object.mTexture,&game->AiEntity[i].spriteFacing,getRenderPosition(game->AiEntity[i].object.rect,mCam,tmp));
+        whatSprite(&game->AiEntity[i]);
+        SDL_RenderCopy(renderer,game->mAiTexture,&game->AiEntity[i].spriteFacing,getRenderPosition(game->AiEntity[i].object.rect,mCam,tmp));
    }
         SDL_RenderPresent(renderer);
 

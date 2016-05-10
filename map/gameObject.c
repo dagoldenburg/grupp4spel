@@ -5,18 +5,19 @@
 #include "time.h"
 Entity createEntity(Entity *entity,int x ,int y)
 {
-
     entity->mVelX=2;
     entity->mVelY=2;
+    entity->spriteFacing.x=0;
+    entity->spriteFacing.y=0;
     entity->spriteFacing.w=32;
     entity->spriteFacing.h=32;
     entity->mPosX=0;
     entity->mPosY=0;
     entity->object.rect.x=x;
     entity->object.rect.y=y;
+    //printf("spawned ai at %d %d\n",x,y);
     entity->object.rect.w=32;
     entity->object.rect.h=32;
-
     return  *entity;
 }
 

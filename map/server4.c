@@ -17,9 +17,8 @@
 #include <pthread.h>
 #include <netinet/in.h>
 #include <fcntl.h>
-#include <time.h>
 
-#define maxplayer 3
+#define maxplayer 2
 __thread int threadLocal;
 __thread int joinQuerry;
 int flag;
@@ -65,10 +64,10 @@ void* send_recv(void* clientData)
         printf("c->client[threadLocal]: %d\n",c->client[threadLocal]);
         while(!done) {
             n = recv(c->client[threadLocal],c->Data[threadLocal].buffer, 100, 0);
-            printf("connect to threadlocal%d",threadLocal);
+
             if (n <= 0) {
                 if (n < 0) {
-                    printf("recv error %d\n",errno);
+                    printf("recv error\n");
                 }
                 if (n == 0){
                     pthread_mutex_lock(&iMutex);
@@ -88,9 +87,14 @@ void* send_recv(void* clientData)
                 done = 1;
                 }else{
 
-                    c->Data[threadLocal].buffer[n] = '\0';
-                    sendFlag = 1;
+                    sendFlag =threadLocal;
                 }
+
+         //   if (!done)
+//                if (send(c->client[threadLocal],str, n, 0) < 0) {
+//                    perror("send");
+//                   done = 1;
+//                }
         }
         return 0;
  }
@@ -104,95 +108,25 @@ void* send_to_all_clients(void* clientData)
             int i,j;
             for(i=0;i<maxplayer;i++)
             {
-                if(c->Data[i].buffer[0]!='\0')
+                if(strcmp("",c->Data[i].buffer)!=0)
                 {
                     printf("buffer from client%d: %s\n",i,c->Data[i].buffer);
                     pthread_mutex_lock(&iMutex);
                     for(j=0;j<maxplayer;j++)
                     {
-                        // todo client control check
-                        if(c->clientControl[j]==1 && (i!=j || strstr(c->Data[i].buffer,"connected")!=NULL))
-                            if(send(c->client[j],c->Data[i].buffer,sizeof(c->Data[i].buffer),0)<0)
-                            {
-                                perror("send to all clients");
 
-                            }
+                        // todo client control check
+
+                        if(send(c->client[j],c->Data[i].buffer,sizeof(c->Data[i].buffer),0)<0)
+                        {
+                            perror("send to all clients");
+
+                        }
                     }
                     sendFlag=0;
-                    c->Data[i].buffer[0]='\0';
                     pthread_mutex_unlock(&iMutex);
                 }
             }
-        }
-    }
-}
-
-void spawnAi(struct clientData *c,char x[], char y[],int tokenArray[]){
-    char spawnAiString[30], intStrBuffer[7]={0};
-    int i;
-    static int nrOfAi=0; // identifikationsnumret på AIn man spawnar, static gör så att vid varje funktions call är värdet det samma.
-    for(i=0;i<500;i++){
-        if(tokenArray==0){
-            nrOfAi = i;
-        }
-        else
-            i=0; //Loopar tills någon plats blir ledig att spawna en ai på
-            // TODO: Om en Ai dör bör klienten skicka ett death meddelande som gör platsen ledig
-    }
-    strcpy(spawnAiString,"spawnai, ID:000 x:0000 y:0000"); // spawnai kommer tolkas som att clienten ska skapa en ai, med ett id nummer och kordinater
-    snprintf(intStrBuffer, 7, "%d",nrOfAi); // gör inten till en string som man kan lägga in i spawnai meddelandet
-    switch(nrOfAi){ // korrigerar så att man skickar rätt siffra på AIn, så man kan urskilja dem.
-        case 0 ... 9: spawnAiString[14] = intStrBuffer[0];
-                      break;
-        case 10 ... 99: spawnAiString[14] = intStrBuffer[1];
-                        spawnAiString[13] = intStrBuffer[0];
-                        break;
-        case 100 ... 999: spawnAiString[14] = intStrBuffer[2];
-                          spawnAiString[13] = intStrBuffer[1];
-                          spawnAiString[12] = intStrBuffer[0];
-                          break;
-    }
-
-    tokenArray[nrOfAi++]=1;
-    spawnAiString[18] = x[0]; // Lägger in x koordinaterna
-    spawnAiString[19] = x[1];
-    spawnAiString[20] = x[2];
-    spawnAiString[21] = x[3];
-
-    spawnAiString[25] = y[0]; // lägger in y koordinaterna
-    spawnAiString[26] = y[1];
-    spawnAiString[27] = y[2];
-    spawnAiString[28] = y[3];
-    spawnAiString[29] = '\n'; //newline
-    spawnAiString[30] = '\0'; // null
-
-    printf("%s", spawnAiString);
-    for(i=0;i<maxplayer;i++){ // en for loop som skickar ut information om att en ai har spawnat
-        if(c->clientControl[i]!=0) // skickar bara till de socket handles som är använda
-            if(send(c->client[i],spawnAiString,sizeof(spawnAiString),0)<0)
-            {
-                perror("spawn ai send failed\n");
-            }
-    }
-}
-
-void* aiSpawner(void *clientData){ //thread
-
-    struct clientData *c=(struct clientData *) clientData;
-    int i;
-    int arrayOfAisToken[500]; // För att se om det finns lediga AI slots
-    // TODO se till att man inte spawnar på en upptagen plats
-    time_t currentTime, lastTime=0;
-    char *posStringX[5]={"0090","0032","1000","0032","0404"};
-    char *posStringY[5]={"0100","0032","0032","1000","0800"};
-
-    time(&lastTime);
-    while(1){
-        time(&currentTime);
-        if(currentTime>lastTime+5){
-            lastTime = currentTime;
-                for(i=0;i<5;i++)
-                    spawnAi(c,posStringX[i],posStringY[i],arrayOfAisToken);
         }
     }
 }
@@ -230,7 +164,7 @@ int main(char argc ,char *argv[])
     for(a=0;a<maxplayer;a++)
     {
         clientData.clientControl[a]=0;
-        clientData.Data[a].buffer[0]='\0';
+      //  clientData.Data[a].sendFlag=0;
 
     }
 
@@ -242,8 +176,6 @@ int main(char argc ,char *argv[])
     int slotsAvailable = 1;
     int serverFullMsg = 0;
     pthread_create(&sendThread,NULL,&send_to_all_clients,(void *)&clientData);
-    pthread_t spawnThread;
-    pthread_create(&spawnThread,NULL,&aiSpawner,(void *)&clientData);
 
     for(;;) {
         printf("Waiting for a connection...\n");
@@ -295,7 +227,7 @@ int main(char argc ,char *argv[])
                     for(i=0;i<maxplayer;i++)
                     {
                         if((clientData.clientControl[i])==0){
-                            clientData.currentClient = next;
+                            clientData.currentClient = i;
                             printf("inside if \n");
                             break;
                         }
