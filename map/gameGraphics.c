@@ -127,13 +127,13 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
         SDL_Rect tmp;
     //set the drawing color to white
    // SDL_Rect rect = {game->playerEntity.mPosX-mCam.x,game->playerEntity.mPosY-mCam.y, 32, 32 };
-    for(i=0;i<5;i++)
+    for(int i=0;i<5;i++)
         SDL_RenderCopy(renderer,game->mPlayerTexture,&game->playerEntity[i].spriteFacing,getRenderPosition(game->playerEntity[i].object.rect,mCam,tmp));
 
 //    SDL_Rect AIrect = {game->AiEntity.mPosX-mCam.x,game->AiEntity.mPosY-mCam.y, 32, 32 };
 //    SDL_RenderCopy(renderer,game->AiEntity.object.mTexture,&game->AiEntity.SpriteFacing,&AIrect);
    // SDL_RenderFillRect(renderer, &rect);
-   for(int i=0;i<highestId;i++)
+   for(int i=0;i<game->nrOfAi;i++)
    {
         whatSprite(&game->AiEntity[i]);
         SDL_RenderCopy(renderer,game->mAiTexture,&game->AiEntity[i].spriteFacing,getRenderPosition(game->AiEntity[i].object.rect,mCam,tmp));
@@ -149,4 +149,3 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
         temp.h=32;
         return &temp;
     }
-

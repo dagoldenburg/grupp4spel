@@ -15,9 +15,12 @@ Entity createEntity(Entity *entity,int x ,int y)
     entity->mPosY=0;
     entity->object.rect.x=x;
     entity->object.rect.y=y;
+    entity->hpData.currentHp=100;
     //printf("spawned ai at %d %d\n",x,y);
     entity->object.rect.w=32;
     entity->object.rect.h=32;
+    entity->strength=10;
+    entity->attackTimer = 0;
     return  *entity;
 }
 
@@ -55,4 +58,10 @@ void coPlayerControll(Entity *coPlayer) /// recv data from other client and send
          coPlayer->spriteFacing.w=32;
          coPlayer->spriteFacing.h=32;
      }
+}
+
+void sortAIArray(Entity AIArray[], int n, int noOfAI) {
+    for(int i = n; i<noOfAI-1;i++){
+        AIArray[i] = AIArray[i+1];
+    }
 }

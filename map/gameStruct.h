@@ -1,11 +1,10 @@
 #ifndef GAMESTRUCT_H_INCLUDED
 #define GAMESTRUCT_H_INCLUDED
-#include "SDL2/SDL.h"
-#include <SDL2/SDL_image.h>
+#include "SDL.h"
+#include <SDL_image.h>
 typedef struct
 {
-    int mWidth;
-    int mHeight;
+
     SDL_Rect rect;
     SDL_Texture* mTexture;
 
@@ -29,6 +28,9 @@ typedef struct
     int mVelX;
     int mVelY;
     int id;
+    int strength;
+    SDL_Rect attack;
+    int attackTimer;
 
 }Entity;
 
