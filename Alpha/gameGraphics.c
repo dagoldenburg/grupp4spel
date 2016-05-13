@@ -250,7 +250,7 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 //    SDL_Rect AIrect = {game->AiEntity.mPosX-mCam.x,game->AiEntity.mPosY-mCam.y, 32, 32 };
 //    SDL_RenderCopy(renderer,game->AiEntity.object.mTexture,&game->AiEntity.SpriteFacing,&AIrect);
    // SDL_RenderFillRect(renderer, &rect);
-   for(int i=0;i<highestId;i++)
+   for(int i=0;i<=highestId;i++)
    {
         if(game->aiEntityToken[i]==1){
             whatSprite(&game->AiEntity[i]);

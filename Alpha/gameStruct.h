@@ -40,10 +40,11 @@ typedef struct
     gameObject gCastleTexture;
     //////////////////////////////////
     Entity playerEntity[6];    /// PLAYER OBJECT
-
+    Entity castle;
     Entity AiEntity[100];
     int aiEntityToken[100];
     int playerEntityToken [6];
+
     int nrOfAi;
     int socket;
     int mySlot;

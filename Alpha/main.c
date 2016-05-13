@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
     safeSend(newPlayer,&gamestate);
     SDL_Delay(15); // två se s tätt inpå kan bli knas.
     safeSend(playerInfo,&gamestate);
+    gamestate.castle=createEntity(&tempEntity,896,508);
 
     for(int i = 0;i<100;i++) // initializera ai token listan
         gamestate.aiEntityToken[i]=0;
