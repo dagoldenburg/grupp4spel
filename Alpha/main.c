@@ -76,11 +76,18 @@ int main(int argc, char *argv[])
                 //coPlayerControll(&gamestate.playerEntity[i]);
             }
         }
+
         for(int i=0;i<highestId;i++)
         {
             gamestate.AiEntity[i].mPosX=getAIPositionX(&gamestate.AiEntity[i]); ///AI data
             gamestate.AiEntity[i].mPosY=getAIPositionY(&gamestate.AiEntity[i]);
             AITTick(&gamestate.AiEntity[i]); /// AI changes position and checks collision
+            if(checkIFObjectHit(&gamestate.playerEntity[gamestate.mySlot].attack, &gamestate.AiEntity[i].object.rect)){//Kollar om spelarens attack kolliderar med AIn
+                if(checkIFAiDead(&gamestate.playerEntity[gamestate.mySlot], &gamestate.AiEntity[i], &gamestate)){//Om kolliderat sänk hpen, om den har dött händer raderna nedan
+                    aiDead(&gamestate, &gamestate.AiEntity[i]);
+                }
+                resetAttack(&gamestate.playerEntity[gamestate.mySlot].attack);
+            }
         }
 
         done = processEvents(window, &gamestate);

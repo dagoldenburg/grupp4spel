@@ -63,6 +63,51 @@ void updatePlayerMovement(GameState *gamestate){
     return;
 }
 
+void giveDamage(GameState *gamestate,Entity *entity){
+    char string[100];
+    int hp;
+    char hpArr[4];
+    sprintf(string,"givedmg, ID:00%d hp:0000", entity->id);
+
+    hp = entity->hpData.currentHp;
+    snprintf(hpArr, 4, "%d",hp); // gör inten till en string som man kan lägga in i spawnai meddelandet
+    switch(hp){ // korrigerar så att man skickar rätt siffra på AIn, så man kan urskilja dem.
+    case 0 ... 9: string[22] = hpArr[0];
+                  break;
+    case 10 ... 99: string[22] = hpArr[1];
+                    string[21] = hpArr[0];
+                    break;
+    case 100 ... 999: string[22] = hpArr[2];
+                      string[21] = hpArr[1];
+                      string[20] = hpArr[0];
+                      break;
+    case 1000 ... 9999: string[22] = hpArr[3];
+                        string[21] = hpArr[2];
+                        string[20] = hpArr[1];
+                        string[19] = hpArr[0];
+                        break;
+    }
+    string[29] = '\n'; //newline
+    string[30] = '\0'; // null
+    printf("trying to send mobHP\n");
+    safeSend(string,gamestate);
+return;
+
+}
+
+void aiDead(GameState *gamestate, Entity *entity){
+    char string[100];
+    gamestate->aiEntityToken[entity->id] = 0;
+    sprintf(string,"aidead!, ID:00%d", entity->id);
+
+    string[29] = '\n'; //newline
+    string[30] = '\0'; // null
+    printf("ai Death\n");
+    safeSend(string,gamestate);
+return;
+
+}
+
 void controlplayer(Entity *playerEntity)
 {
     int ms = SDL_GetTicks();
@@ -73,7 +118,7 @@ void controlplayer(Entity *playerEntity)
         playerEntity->spriteFacing.x=sprite*32;
         playerEntity->spriteFacing.y=64;
 
-        playerEntity->object.rect.x -= 2;
+        playerEntity->object.rect.x -= PLAYER_SPEED;
         if(TilemapCollisionDetection(playerEntity->object.rect))
         {
            playerEntity->object.rect.x += PLAYER_SPEED;
@@ -84,7 +129,7 @@ void controlplayer(Entity *playerEntity)
 
         playerEntity->spriteFacing.x=sprite*32;
         playerEntity->spriteFacing.y=96;
-        playerEntity->object.rect.x += 2;
+        playerEntity->object.rect.x += PLAYER_SPEED;
         if(TilemapCollisionDetection(playerEntity->object.rect))
         {
            playerEntity->object.rect.x -= PLAYER_SPEED;
@@ -94,7 +139,7 @@ void controlplayer(Entity *playerEntity)
     {
         playerEntity->spriteFacing.x=sprite*32;
         playerEntity->spriteFacing.y=0;
-        playerEntity->object.rect.y -= 2;
+        playerEntity->object.rect.y -= PLAYER_SPEED;
         if(TilemapCollisionDetection(playerEntity->object.rect))
         {
           playerEntity->object.rect.y += PLAYER_SPEED;
@@ -104,15 +149,30 @@ void controlplayer(Entity *playerEntity)
     {
         playerEntity->spriteFacing.x=sprite*32;
         playerEntity->spriteFacing.y=32;
-        playerEntity->object.rect.y += 2;
+        playerEntity->object.rect.y += PLAYER_SPEED;
         if(TilemapCollisionDetection(playerEntity->object.rect))
         {
            playerEntity->object.rect.y -= PLAYER_SPEED;
         }
 
     }
-    playWallCollision(&playerEntity->object);
+    if(state[SDL_SCANCODE_SPACE]){ // Spelaren går Attackerar
+        if(playerEntity->attackTimer == 0 || (SDL_GetTicks() - playerEntity->attackTimer) >100){
+            spawnAttack(playerEntity);
+            playerEntity->attackTimer = SDL_GetTicks();
+        }
+    }
+    playWallCollision(&playerEntity->object );
         ///*********************player colliction detector*************************////
+
+}
+
+void spawnAttack(Entity *playerEntity) {
+    playerEntity->attack = playerEntity->object.rect;
+    playerEntity->attack.x -= TILESIZE/2;
+    playerEntity->attack.y -= TILESIZE/2;
+    playerEntity->attack.h += TILESIZE;
+    playerEntity->attack.w += TILESIZE;
 
 }
 void playWallCollision(gameObject *object)
@@ -167,6 +227,87 @@ int TilemapCollisionDetection(SDL_Rect rect){
     }
     return 0;
 }
+
+int checkIFObjectHit(SDL_Rect *playerRect, SDL_Rect *AiRect){
+    if(playerRect->x == 0 && playerRect->y == 0 && playerRect->h == 0 && playerRect->w ==0)
+        return 0;
+
+
+    if(playerRect->x >= AiRect->x && playerRect->x <= AiRect->x + AiRect->w &&
+       playerRect->y >= AiRect->y && playerRect->y <= AiRect->y + AiRect->h){
+        printf("%d, %d", playerRect->x, AiRect->x);
+        return 1;
+    }
+    if(playerRect->x + playerRect->w>= AiRect->x && playerRect->x + playerRect->w <= AiRect->x + AiRect->w &&
+       playerRect->y >= AiRect->y && playerRect->y <= AiRect->y + AiRect->h){
+           printf("RIGHT\n");
+        return 1;
+    }
+
+    if(playerRect->x >= AiRect->x && playerRect->x <= AiRect->x + AiRect->w &&
+       playerRect->y + playerRect->h>= AiRect->y && playerRect->y + playerRect->h <= AiRect->y + AiRect->h){
+           printf("LEFT\n");
+        return 1;
+    }
+
+    if(playerRect->x + playerRect->w>= AiRect->x && playerRect->x + playerRect->w <= AiRect->x + AiRect->w &&
+       playerRect->y + playerRect->h>= AiRect->y && playerRect->y + playerRect->h <= AiRect->y + AiRect->h){
+           printf("BOTTOM\n");
+        return 1;
+    }
+
+
+
+
+    return 0;
+
+}
+
+
+int checkIFAiDead(Entity *player, Entity *AI, GameState *gamestate){
+   /* if(player->spriteFacing.y == 64){
+        AI->object.rect.x -= 10;
+        if(TilemapCollisionDetection(AI->object.rect)){
+            AI->object.rect.x += 10;
+        }
+    }
+    if(player->spriteFacing.y == 96){
+        AI->object.rect.x += 10;
+        if(TilemapCollisionDetection(AI->object.rect)){
+            AI->object.rect.x -= 10;
+        }
+    }
+    if(player->spriteFacing.y == 0){
+        AI->object.rect.y -= 10;
+        if(TilemapCollisionDetection(AI->object.rect)){
+            AI->object.rect.y += 10;
+        }
+
+    }
+    if(player->spriteFacing.y == 32){
+        AI->object.rect.y += 10;
+        if(TilemapCollisionDetection(AI->object.rect)){
+            AI->object.rect.y -= 10;
+        }
+    }
+    */
+    if((AI->hpData.currentHp -= player->strength) <0) {
+         giveDamage(gamestate, AI);
+        return 1;
+    }
+    giveDamage(gamestate, AI);
+    return 0;
+
+}
+
+
+void resetAttack(SDL_Rect *attack){
+    attack->h = 0;
+    attack->w = 0;
+    attack->x = 0;
+    attack->y = 0;
+}
+
 int processEvents(SDL_Window *window, GameState *game)
 {
     SDL_Event event;

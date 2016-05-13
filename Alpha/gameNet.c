@@ -49,12 +49,12 @@ void *recvfunc(void *gamestate)
     int mySlot = 0;
     pthread_mutex_t lock;
     pthread_mutex_init(&lock,NULL);
-    GameState *g=(struct GameState *) gamestate;
+    GameState *g=( GameState *) gamestate;
     Entity tempEntity;
 
     int t;
-    int x,y,id; // varför variabel behöver en egen array som man kan lägga över från bufffern och göra atoi på
-    char xArr[5],yArr[5],idArr[4],slot[3];
+    int x,y,id, hp; // varför variabel behöver en egen array som man kan lägga över från bufffern och göra atoi på
+    char xArr[5],yArr[5],idArr[4],slot[3], hpArr[4];
     highestId=0;
     while(1){
         pthread_mutex_lock(&lock);
@@ -108,6 +108,7 @@ void *recvfunc(void *gamestate)
             g->aiEntityToken[id] = 1;
             //printf("highestId: %d aiId:%d entityToken: %d\n",highestId,aiId,g->aiEntityToken[aiId]);
             g->AiEntity[id]=createEntity(&tempEntity, x, y);
+            g->AiEntity[id].id = id;
             g->AiEntity[id].mPosX=getAIPositionX(&g->AiEntity[id]);
             g->AiEntity[id].mPosY=getAIPositionY(&g->AiEntity[id]);
         }
@@ -140,9 +141,26 @@ void *recvfunc(void *gamestate)
             g->playerEntity[id].object.rect.y = y;
 
         }
-        /*if(strstr(recvbuffer,"givedmg")!=NULL){
+        if(strstr(recvbuffer,"givedmg")!=NULL){
+            printf("ai HealthRecieved\n");
+            idArr[0] = recvbuffer[12];// Lägger in x koordinaterna
+            idArr[1] = recvbuffer[13];
+            idArr[2] = recvbuffer[14];
+            idArr[3] = '\0';
 
-        }*/
+            hpArr[0] = recvbuffer[19];// Lägger in hp koordinaterna
+            hpArr[1] = recvbuffer[20];
+            hpArr[2] = recvbuffer[21];
+            hpArr[3] = recvbuffer[22];
+            hpArr[4] = '\0';
+
+            recvbuffer[0]='\0';
+            hp = atoi(hpArr);
+            id = atoi(idArr);
+
+            printf("Damgage data recieved");
+            g->AiEntity[id].hpData.currentHp = hp;
+        }
         if(strstr(recvbuffer,"aidead!")!=NULL){
             printf("jag ska inte vara här \n");
             idArr[0] = recvbuffer[12];// Lägger in x koordinaterna
@@ -150,13 +168,13 @@ void *recvfunc(void *gamestate)
             idArr[2] = recvbuffer[14];
             idArr[3] = '\0';
             id = atoi(idArr);
-            g->aiEntityToken[recvbuffer[id]] = 0;
+            g->aiEntityToken[id] = 0;
             if(id==highestId){ //hittar nya highestId
-                highestId=0;
-                for(int i = 0;i<100;i++){
-                    if(g->aiEntityToken[i]==1 && i>= highestId){
+                for(int i = highestId;i>=0;i--){
+                    if(g->aiEntityToken[i]==1){
                         highestId=i;
-                        printf("new highest id: %d highestId");
+                        break;
+                      //  printf("new highest id: %d highestId");
                     }
                  }
              }
@@ -243,7 +261,7 @@ HERE:
   // memset(&serv_addr,0,sizeof(serv_addr));
     serv_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(atoi("3232"));
+    serv_addr.sin_port = htons(atoi("3233"));
 if (connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
     perror("connect");
     exit(1);

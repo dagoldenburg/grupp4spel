@@ -19,9 +19,11 @@ Entity createEntity(Entity *entity,int x ,int y)
     entity->object.rect.y=y;
     entity->object.rect.w=32;
     entity->object.rect.h=32;
-    entity->hpData.maxHp = 20;
-    entity->hpData.currentHp = 20;
+    entity->hpData.maxHp = 100;
+    entity->hpData.currentHp = 60;
     entity->hpData.sizeOfHealthbar = 32;
+    entity->strength = 10;
+    resetAttack(&entity->attack);
 
     /*entity->hpData.healthBarMax.x=x;
     entity->hpData.healthBarMax.y=y+32;
@@ -48,8 +50,8 @@ void coPlayerControll(Entity *coPlayer) /// recv data from other client and send
     int ms = SDL_GetTicks();
     int sprite = ms /150 % 3+2;
     //printf("sprite %d",sprite);
-   // printf("coPlayer->mPosX: %d\n",coPlayer->mPosX);
-    //printf("coPlayer->mPosX: %d\n",coPlayer->mPosY);
+    printf("coPlayer->mPosX: %d\n",coPlayer->mPosX);
+    printf("coPlayer->mPosX: %d\n",coPlayer->mPosY);
     if(getAIPositionX(coPlayer)>coPlayer->mPosX)
        {
            coPlayer->spriteFacing.x = sprite*32;

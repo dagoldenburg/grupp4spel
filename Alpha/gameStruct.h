@@ -29,6 +29,10 @@ typedef struct
     int mVelX;
     int mVelY;
     int id;
+    int strength;
+    SDL_Rect attack;
+    int attackTimer;
+
 
 }Entity;
 
