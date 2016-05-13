@@ -19,11 +19,9 @@ Entity createEntity(Entity *entity,int x ,int y)
     entity->object.rect.y=y;
     entity->object.rect.w=32;
     entity->object.rect.h=32;
-    entity->hpData.maxHp = 100;
-    entity->hpData.currentHp = 60;
+    entity->hpData.maxHp = 20;
+    entity->hpData.currentHp = 20;
     entity->hpData.sizeOfHealthbar = 32;
-    entity->strength = 10;
-    resetAttack(&entity->attack);
 
     /*entity->hpData.healthBarMax.x=x;
     entity->hpData.healthBarMax.y=y+32;

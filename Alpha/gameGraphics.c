@@ -11,7 +11,7 @@ void loadMedia(GameState *game)
      SDL_Surface *loadedSurface=NULL;
 
         ///****************************MAP-Textures****************************///
-    loadedSurface=IMG_Load("textures/tiles.png");
+    loadedSurface=IMG_Load("tiles.png");
     if(loadedSurface==NULL)
     {
         printf("Cannot find tiles.png\n\n");
@@ -40,6 +40,65 @@ void loadMedia(GameState *game)
     game->TileClip[3].y=0;
     game->TileClip[3].w=80;
     game->TileClip[3].h=80;
+
+    SDL_FreeSurface( loadedSurface );
+
+
+    loadedSurface=IMG_Load("textures/castle.gif");
+    if(loadedSurface==NULL)
+    {
+        printf("Cannot find castle.png\n\n");
+        SDL_Quit();
+        exit(1);
+
+    }
+    SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0x0, 0xFF));
+    game->gCastleTexture.mTexture=SDL_CreateTextureFromSurface(game->renderer,loadedSurface);
+
+    game->CastleTileClip[0].x=0;
+    game->CastleTileClip[0].y=0;
+    game->CastleTileClip[0].w=32;
+    game->CastleTileClip[0].h=32;
+
+    game->CastleTileClip[1].x=32;
+    game->CastleTileClip[1].y=0;
+    game->CastleTileClip[1].w=32;
+    game->CastleTileClip[1].h=32;
+
+    game->CastleTileClip[2].x=64;
+    game->CastleTileClip[2].y=0;
+    game->CastleTileClip[2].w=32;
+    game->CastleTileClip[2].h=32;
+
+    game->CastleTileClip[3].x=0;
+    game->CastleTileClip[3].y=32;
+    game->CastleTileClip[3].w=32;
+    game->CastleTileClip[3].h=32;
+
+    game->CastleTileClip[4].x=32;
+    game->CastleTileClip[4].y=32;
+    game->CastleTileClip[4].w=32;
+    game->CastleTileClip[4].h=32;
+
+    game->CastleTileClip[5].x=64;
+    game->CastleTileClip[5].y=32;
+    game->CastleTileClip[5].w=32;
+    game->CastleTileClip[5].h=32;
+
+    game->CastleTileClip[6].x=0;
+    game->CastleTileClip[6].y=64;
+    game->CastleTileClip[6].w=32;
+    game->CastleTileClip[6].h=32;
+
+    game->CastleTileClip[7].x=32;
+    game->CastleTileClip[7].y=64;
+    game->CastleTileClip[7].w=32;
+    game->CastleTileClip[7].h=32;
+
+    game->CastleTileClip[8].x=64;
+    game->CastleTileClip[8].y=64;
+    game->CastleTileClip[8].w=32;
+    game->CastleTileClip[8].h=32;
 
     SDL_FreeSurface( loadedSurface );
         ///***********************************player Texture********************************///
@@ -107,14 +166,69 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
             }
             if(playfield[i][j]==2)
             {
-                SDL_Rect camera3={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
-                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera3);
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
             }
             if(playfield[i][j]==3)
             {
                 SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
                 SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[3],&camera2);
             }
+            if(playfield[i][j]==4)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[0],&camera2);
+            }
+            if(playfield[i][j]==5)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[1],&camera2);
+            }
+            if(playfield[i][j]==6)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[2],&camera2);
+            }
+            if(playfield[i][j]==7)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[3],&camera2);
+            }
+            if(playfield[i][j]==8)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[4],&camera2);
+            }
+            if(playfield[i][j]==9)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[5],&camera2);
+            }
+            if(playfield[i][j]==10)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[6],&camera2);
+            }
+            if(playfield[i][j]==11)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[7],&camera2);
+            }
+            if(playfield[i][j]==12)
+            {
+                SDL_Rect camera2={j*TILESIZE-mCam.x,i*TILESIZE-mCam.y,TILESIZE,TILESIZE};
+                SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&game->TileClip[2],&camera2);
+                SDL_RenderCopy(renderer,game->gCastleTexture.mTexture,&game->CastleTileClip[8],&camera2);
+            }
+
         }
 
     }

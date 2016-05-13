@@ -29,10 +29,6 @@ typedef struct
     int mVelX;
     int mVelY;
     int id;
-    int strength;
-    SDL_Rect attack;
-    int attackTimer;
-
 
 }Entity;
 
@@ -40,6 +36,8 @@ typedef struct
 {
     SDL_Rect TileClip[4]; ///MAP OBJECT
     gameObject gTileTexture;
+    SDL_Rect CastleTileClip[9];
+    gameObject gCastleTexture;
     //////////////////////////////////
     Entity playerEntity[6];    /// PLAYER OBJECT
 
