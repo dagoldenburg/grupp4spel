@@ -15,15 +15,18 @@
 #include "gameObject.h"
 #include "main.h"
 #include "gameGraphics.h"
-#include "gameAction.h"
 #include "gameAI.h"
+#include "gameAction.h"
 #include "gameNet.h"
+#include "updatedMenu.h"
+
+int threadJoinQuerry;
+
 int main(int argc, char *argv[])
 {
     pthread_t recvThread;
     srand(time(NULL));
     GameState gamestate;
-    gamestate.socket=TCP_socket_connection();
     SDL_Window *window=NULL;                    // Declare a window
     SDL_Renderer *renderer=NULL;                // Declare a renderer
     Entity tempEntity;
@@ -52,36 +55,46 @@ int main(int argc, char *argv[])
 
     /**Event loop*/
 
-    pthread_create(&recvThread,NULL,recvfunc,(void *)&gamestate);
     int done = 0; // NEDANSTÅENDE SKA BLI EN FUNKTION SOM LIGGER I GAMENET
-    char newPlayer[8],playerInfo[8];
-    strcpy(newPlayer,"newplyr");
-    strcpy(playerInfo,"plyrinf");
-    safeSend(newPlayer,&gamestate);
-    SDL_Delay(15); // två se s tätt inpå kan bli knas.
-    safeSend(playerInfo,&gamestate);
-    gamestate.castle=createEntity(&tempEntity,896,508);
+
+ // TODO GÖR 96x96
 
     for(int i = 0;i<100;i++) // initializera ai token listan
         gamestate.aiEntityToken[i]=0;
 
   //Event loop
+  while(1){
+  for(int i = 0;i<100;i++) // initializera ai token listan
+        gamestate.aiEntityToken[i]=0;
+    threadJoinQuerry = 0;
+    startMenu(renderer,&gamestate);
+    gamestate.castle=createEntity(&tempEntity,896,508,96,96,500.0);
     while(!done) ///main game loop
     {
-    //printf("myslot: %d", gamestate.mySlot);
-    //Check for events
         for(int i=0;i<maxPlayers;i++){
-            if(gamestate.playerEntityToken[i]==1){
+            if(gamestate.playerEntityToken[i]!=0){
                 gamestate.playerEntity[i].mPosX=getAIPositionX(&gamestate.playerEntity[i]); /// get last mainplayers position
                 gamestate.playerEntity[i].mPosY=getAIPositionY(&gamestate.playerEntity[i]);
                 //coPlayerControll(&gamestate.playerEntity[i]);
             }
         }
-        for(int i=0;i<highestId;i++)
-        {
+        for(int i=0;i<=highestId;i++){
+            if(gamestate.aiEntityToken[i]!=0){
+                if(gamestate.AiEntity[i].hpData.currentHp <= 0){
+                    gamestate.aiEntityToken[i] = 0;
+                }
+            }
+        }
+        for(int i=0;i<=highestId;i++){
             gamestate.AiEntity[i].mPosX=getAIPositionX(&gamestate.AiEntity[i]); ///AI data
             gamestate.AiEntity[i].mPosY=getAIPositionY(&gamestate.AiEntity[i]);
             AITTick(&gamestate.AiEntity[i]); /// AI changes position and checks collision
+            if(gamestate.aiEntityToken[i]!=0){
+                if(checkIFObjectHit(&gamestate.playerEntity[gamestate.mySlot].attack, &gamestate.AiEntity[i].object.rect)){//Kollar om spelarens attack kolliderar med AIn
+                    giveDamage(&gamestate,i);
+                    resetAttack(&gamestate.playerEntity[gamestate.mySlot].attack);
+                }
+            }
         }
 
         done = processEvents(window, &gamestate);
@@ -105,7 +118,6 @@ int main(int argc, char *argv[])
             cameraScene.y = LEVEL_HEIGHT - cameraScene.h;
         }
 
-
     //Render display
         doRender(renderer, &gamestate,cameraScene); /// renderer Ai , players and  map
 
@@ -117,7 +129,17 @@ int main(int argc, char *argv[])
             printf("Attempting to update player movement\n");
             updatePlayerMovement(&gamestate);
         }
+        ///*******'LOSS CONDITION*****////
+        if(gamestate.castle.hpData.currentHp<=0){
+            done=1;
         }
+    }
+    //TODO Rensa upp alla textures osv
+    threadJoinQuerry = 1;
+    pthread_join(recvThread,NULL);
+    close(gamestate.socket);
+    lossMenu(renderer);
+}
   // Close and destroy the window
     SDL_DestroyTexture(gamestate.gTileTexture.mTexture);
 

@@ -14,8 +14,24 @@ int getmPosY(Entity *entity)
     return entity->object.rect.y;
 }
 
+
+void aiDead(GameState *gamestate, Entity *entity){
+    char string[31];
+
+    sprintf(string,"aidead!, ID:00%d", entity->id);
+
+    stringManipulate(entity->id,14,string);
+
+    string[29] = '\n'; //newline
+    string[30] = '\0'; // null
+    gamestate->aiEntityToken[entity->id] = 0;
+    printf("ai Death %d token %d\n",entity[entity->id],gamestate->aiEntityToken[entity->id]);
+    safeSend(string,gamestate);
+    return;
+}
+
 void updatePlayerMovement(GameState *gamestate){
-        char string[100];
+        char string[30];
         int x,y;
         char xArr[4],yArr[4];
         sprintf(string,"movplyr, ID:00%d x:0000 y:0000",gamestate->mySlot);
@@ -61,6 +77,51 @@ void updatePlayerMovement(GameState *gamestate){
         printf("trying to send player movement\n");
         safeSend(string,gamestate);
     return;
+}
+
+void giveDamage(GameState *gamestate,int i){
+    char string[30];
+    int hp;
+    strcpy(string,"givedmg, ID:000 hp:0000......");
+    gamestate->AiEntity[i].hpData.currentHp -= gamestate->playerEntity[gamestate->mySlot].strength;
+    hp = gamestate->AiEntity[i].hpData.currentHp;
+    stringManipulate(i,14,string);
+    stringManipulate(hp,22,string);
+    safeSend(string,gamestate);
+return;
+
+}
+
+
+
+void spawnAttack(Entity *playerEntity) {
+    playerEntity->attack = playerEntity->object.rect;
+
+    if(playerEntity->spriteFacing.y == 0){ //Up
+        playerEntity->attack.x -= TILESIZE/4;
+        playerEntity->attack.w += TILESIZE/2;
+        playerEntity->attack.y -= TILESIZE;
+    }
+
+    if(playerEntity->spriteFacing.y == 32){ //Down
+        playerEntity->attack.x -= TILESIZE/4;
+        playerEntity->attack.w += TILESIZE/2;
+        playerEntity->attack.y += TILESIZE;
+    }
+
+    if(playerEntity->spriteFacing.y == 96){ //Right
+        playerEntity->attack.x += TILESIZE;
+        playerEntity->attack.h += TILESIZE/2;
+        playerEntity->attack.y -= TILESIZE/4;
+    }
+
+    if(playerEntity->spriteFacing.y == 64){ //Left
+        playerEntity->attack.x -= TILESIZE;
+        playerEntity->attack.h += TILESIZE/2;
+        playerEntity->attack.y -= TILESIZE/4;
+    }
+
+return;
 }
 
 void controlplayer(Entity *playerEntity)
@@ -109,12 +170,46 @@ void controlplayer(Entity *playerEntity)
         {
            playerEntity->object.rect.y -= PLAYER_SPEED;
         }
-
     }
+    if(state[SDL_SCANCODE_SPACE]){
+        if(playerEntity->attackTimer == 0 || (SDL_GetTicks() - playerEntity->attackTimer) >100){
+            spawnAttack(playerEntity);
+            playerEntity->attackTimer = SDL_GetTicks();
+        }
+    }
+
     playWallCollision(&playerEntity->object);
         ///*********************player colliction detector*************************////
 
 }
+
+int checkIFObjectHit(SDL_Rect *playerRect, SDL_Rect *AiRect){
+    if (playerRect->x <= AiRect->x + AiRect->w&&
+       playerRect->x + playerRect->w >= AiRect->x &&
+       playerRect->y <= AiRect->y + AiRect->h &&
+       playerRect->y + playerRect->w >= AiRect->y) {
+        return 1;
+    }
+    return 0;
+}
+int checkIFAiDead(Entity *player, Entity *AI, GameState *gamestate){
+    if((AI->hpData.currentHp -= player->strength) <0) {
+         giveDamage(gamestate, AI);
+        return 1;
+    }
+    giveDamage(gamestate, AI);
+    return 0;
+
+}
+
+
+void resetAttack(SDL_Rect *attack){
+    attack->h = 0;
+    attack->w = 0;
+    attack->x = 0;
+    attack->y = 0;
+}
+
 void playWallCollision(gameObject *object)
 {
 

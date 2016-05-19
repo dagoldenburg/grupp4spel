@@ -34,6 +34,7 @@
 		<Linker>
 			<Add option="-lSDL2" />
 			<Add option="-lSDL2_image" />
+			<Add option="-lSDL2_ttf" />
 			<Add option="-lpthread" />
 		</Linker>
 		<Unit filename="gameAI.c">
@@ -65,6 +66,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="playField.h" />
+		<Unit filename="updatedMenu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="updatedMenu.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

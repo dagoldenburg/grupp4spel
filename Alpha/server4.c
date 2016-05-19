@@ -46,9 +46,6 @@ struct clientData
     struct Data Data[maxplayer];
     int currentClient;
 };
-
-void updatePlayerInfo(struct clientData *c);
-
 pthread_mutex_t iMutex;
 pthread_t sendThread;
 int n,done;
@@ -66,11 +63,6 @@ void* send_recv(void* clientData)
     char deadAiId[4];
     char slot[2];
     char welcomeString[17];
-    char hej[4] = "hej";
-    if (send(c->client[threadLocal], hej, sizeof(hej), 0) == -1) {
-        perror("send");
-        exit(1);
-    }
         // thread release
     printf("Connected,threadlocal = %d.\n",threadLocal);
     printf("Connected,currentclient = %d.\n",c->currentClient);
@@ -88,12 +80,11 @@ void* send_recv(void* clientData)
                 if (n == 0){
                     pthread_mutex_lock(&iMutex);
                     c->currentClient = threadLocal;
-                    c->clientControl[threadLocal]=0;
-                    updatePlayerInfo(c);
                     printf("closing:%d\n",c->client[threadLocal]);
                     if(close(c->client[threadLocal])==-1){
                         printf("no close on:%d\n",threadLocal);
                     }
+                    c->clientControl[threadLocal]=0;
                     nextExit = threadLocal;
                     printf("next i tråd: %d\n",next);
                     printf("not connected\n");
@@ -126,40 +117,35 @@ void* send_recv(void* clientData)
                             }
                             //pthread_mutex_unlock(&newPlayerMutex);
                     }
-                    if(strstr(c->Data[threadLocal].buffer, "plyrinf")!=NULL)
-                        updatePlayerInfo(c);
-
+                    if(strstr(c->Data[threadLocal].buffer, "plyrinf")!=NULL){
+                        char playerInfoString[22];
+                        int one,two,three,four,five,six;
+                        for(i=0;i<maxplayer;i++){
+                            switch(i){
+                                case 0: if(c->clientControl[i]==1){ one = i; }else{ one = 7; }break;
+                                case 1: if(c->clientControl[i]==1){ two = i; }else{ two = 7; }break;
+                                case 2: if(c->clientControl[i]==1){ three = i; }else{ three = 7; }break;
+                                case 3: if(c->clientControl[i]==1){ four = i; }else{ four = 7; }break;
+                                case 4: if(c->clientControl[i]==1){ five = i; }else{ five = 7; }break;
+                                case 5: if(c->clientControl[i]==1){ six = i; }else{ six = 7; }break;
+                            }
+                        }
+                        snprintf(playerInfoString,21,"plrinfr: %d %d %d %d %d %d",one,two,three,four,five,six);
+                        playerInfoString[20]='\n';
+                        playerInfoString[21]='\0';
+                        for(i = 0;i<maxplayer;i++) // skicka til alla för att uppdatera alla om att en ny spelare finns
+                            if(c->clientControl[i]==1)
+                                if (send(c->client[i], playerInfoString, sizeof(playerInfoString), 0) == -1) {
+                                        perror("send");
+                                        exit(1);
+                                }
+                    }
                     c->Data[threadLocal].buffer[n] = '\0';
                     sendFlag = 1;
                 }
         }
         return 0;
  }
-
-void updatePlayerInfo(struct clientData *c){
-    char playerInfoString[22];
-    int one,two,three,four,five,six,i;
-    for(i=0;i<maxplayer;i++){
-        switch(i){
-            case 0: if(c->clientControl[i]==1){ one = i; }else{ one = 7; }break;
-            case 1: if(c->clientControl[i]==1){ two = i; }else{ two = 7; }break;
-            case 2: if(c->clientControl[i]==1){ three = i; }else{ three = 7; }break;
-            case 3: if(c->clientControl[i]==1){ four = i; }else{ four = 7; }break;
-            case 4: if(c->clientControl[i]==1){ five = i; }else{ five = 7; }break;
-            case 5: if(c->clientControl[i]==1){ six = i; }else{ six = 7; }break;
-        }
-    }
-    snprintf(playerInfoString,21,"plrinfr: %d %d %d %d %d %d",one,two,three,four,five,six);
-    playerInfoString[20]='\n';
-    playerInfoString[21]='\0';
-    for(i = 0;i<maxplayer;i++) // skicka til alla för att uppdatera alla om att en ny spelare finns
-        if(c->clientControl[i]==1)
-            if (send(c->client[i], playerInfoString, sizeof(playerInfoString), 0) == -1) {
-                    perror("send");
-                    exit(1);
-            }
-    return;
-    }
 void* send_to_all_clients(void* clientData)
 {
     struct clientData *c=(struct clientData *) clientData;
@@ -255,16 +241,16 @@ void* aiSpawner(void *clientData){ //thread
     int i;
     // TODO se till att man inte spawnar på en upptagen plats
     time_t currentTime, lastTime=0;
-    char *posStringX[5]={"0032","1856","0704","1152","0928"};
-    char *posStringY[5]={"0540","0540","0064","0064","1016"};
+    char *posStringX[5]={"0032","0032","0032","0032","0032"};
+    char *posStringY[5]={"0000","0032","0064","0096","0128"};
     time(&lastTime);
     while(1){
         time(&currentTime);
         if(currentTime>lastTime+5){
             lastTime = currentTime;
                 for(i=0;i<5;i++){
-                    spawnAi(c,posStringX[i],posStringY[i]);
                     usleep(15000);
+                    //spawnAi(c,posStringX[i],posStringY[i]);
                 }
         }
     }

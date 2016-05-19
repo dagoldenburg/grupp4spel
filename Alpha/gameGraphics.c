@@ -233,7 +233,6 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
 
     }
 
-//
 //    SDL_Rect camera={0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 //    SDL_RenderCopy(renderer,game->gTileTexture.mTexture,&mCam,&camera);
 
@@ -257,7 +256,9 @@ void doRender(SDL_Renderer *renderer, GameState *game,SDL_Rect mCam)
             SDL_RenderCopy(renderer,game->mAiTexture,&game->AiEntity[i].spriteFacing,getRenderPosition(game->AiEntity[i].object.rect,mCam,tmp));
         }
    }
-        SDL_RenderPresent(renderer);
+
+    SDL_RenderPresent(renderer);
+        //SDL_RenderPresent(renderer);
 }
     SDL_Rect *getRenderPosition(SDL_Rect entity,SDL_Rect mCam,SDL_Rect temp)
     {

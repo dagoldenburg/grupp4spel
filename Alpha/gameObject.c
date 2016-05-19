@@ -5,7 +5,7 @@
 #include "time.h"
 #include "gameAI.h"
 
-Entity createEntity(Entity *entity,int x ,int y)
+Entity createEntity(Entity *entity,int x ,int y,int w,int h, float hp)
 {
     entity->mVelX=0;
     entity->mVelY=0;
@@ -17,29 +17,30 @@ Entity createEntity(Entity *entity,int x ,int y)
     entity->mPosY=0;
     entity->object.rect.x=x;
     entity->object.rect.y=y;
-    entity->object.rect.w=32;
-    entity->object.rect.h=32;
-    entity->hpData.maxHp = 20;
-    entity->hpData.currentHp = 20;
+    entity->object.rect.w=w;
+    entity->object.rect.h=h;
+    entity->hpData.maxHp = hp;
+    entity->hpData.currentHp = hp;
     entity->hpData.sizeOfHealthbar = 32;
+    entity->strength = 5;
 
-    /*entity->hpData.healthBarMax.x=x;
-    entity->hpData.healthBarMax.y=y+32;
-    entity->hpData.healthBarMax.w=32;
-    entity->hpData.healthBarMax.h=8;
     entity->hpData.healthBarMax.x=x;
     entity->hpData.healthBarMax.y=y+32;
-    entity->hpData.healthBarMax.w=32;
-    entity->hpData.healthBarMax.h=8;*/
+    entity->hpData.healthBarMax.w=w;
+    entity->hpData.healthBarMax.h=h/4;
+    entity->hpData.healthBarMax.x=x;
+    entity->hpData.healthBarMax.y=y+32;
+    entity->hpData.healthBarMax.w=w;
+    entity->hpData.healthBarMax.h=h/4;
 
-    /*entity->hpData.healthBarCurrent.x=x;
-    entity->hpData.healthBarCurrent.y=y+32;
-    entity->hpData.healthBarCurrent.w=32;
-    entity->hpData.healthBarCurrent.h=8;
     entity->hpData.healthBarCurrent.x=x;
     entity->hpData.healthBarCurrent.y=y+32;
-    entity->hpData.healthBarCurrent.w=32;
-    entity->hpData.healthBarCurrent.h=8;*/
+    entity->hpData.healthBarCurrent.w=w;
+    entity->hpData.healthBarCurrent.h=h/4;
+    entity->hpData.healthBarCurrent.x=x;
+    entity->hpData.healthBarCurrent.y=y+32;
+    entity->hpData.healthBarCurrent.w=w;
+    entity->hpData.healthBarCurrent.h=h/4;
     return  *entity;
 }
 
