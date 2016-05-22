@@ -2,6 +2,7 @@
 #define GAMESTRUCT_H_INCLUDED
 #include "SDL2/SDL.h"
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_net.h>
 typedef struct
 {
     int mWidth;
@@ -49,7 +50,7 @@ typedef struct
     int playerEntityToken [6];
 
     int nrOfAi;
-    int socket;
+    TCPsocket socket;
     int mySlot;
     SDL_Renderer *renderer;
     SDL_Texture* mAiTexture;
