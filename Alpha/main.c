@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     //TODO Rensa upp alla textures osv
     threadJoinQuerry = 1;
     pthread_join(recvThread,NULL);
-    close(gamestate.socket);
+    SDLNet_TCP_Close(gamestate.socket);
     lossMenu(renderer);
 }
   // Close and destroy the window

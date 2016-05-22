@@ -310,7 +310,7 @@ TCPsocket TCP_socket_connection()
              printf("SDL_net init error");
              exit(EXIT_FAILURE);
         }
-         if(SDLNet_ResolveHost(&client,"127.0.0.1",3232)<0)
+         if(SDLNet_ResolveHost(&client,"130.237.84.86",3231)<0)
          {
              printf("SDLnet_resolveHost error");
              exit(EXIT_FAILURE);
