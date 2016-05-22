@@ -8,6 +8,7 @@
 #elif __linux
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_net.h>
 
 #endif
 #include <time.h>
@@ -36,10 +37,16 @@ pthread_mutex_t sendLock;
 void safeSend(char sendString[31],GameState *gamestate){
     SDL_Delay(15);
     pthread_mutex_lock(&sendLock);
-    if (send(gamestate->socket, sendString, strlen(sendString), 0) == -1)
+//    if (send(gamestate->socket, sendString, strlen(sendString), 0) == -1)
+//    {
+//        perror("send");
+//        exit(1);
+//    }
+     int len=strlen(sendString);
+    if(SDLNet_TCP_Send(gamestate->socket,sendString,len)==-1)
     {
-        perror("send");
-        exit(1);
+        fprintf(stderr, "SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
     }
     pthread_mutex_unlock(&sendLock);
 }
@@ -82,12 +89,18 @@ void *recvfunc(void *gamestate)
     char xArr[5],yArr[5],idArr[4],slot[3],hpArr[4];
     highestId=0;
     while(1){
-        if ((t=recv(g->socket, recvbuffer, 30, 0)) > 0) {
-            recvbuffer[t] = '\0';
-          //  sscanf(buffer"%d %d",)
-            //
+//        if ((t=recv(g->socket, recvbuffer, 30, 0)) > 0) {
+//            recvbuffer[t] = '\0';
+//            sscanf(buffer"%d %d",)
+//
+//
+//        }
+        if((t=SDLNet_TCP_Recv(g->socket,recvbuffer,30))>0)
+        {
+            recvbuffer[t]='\0';
+            printf(">%s",recvbuffer);
 
-        } else {
+        }else {
             if (t <= 0) perror("recv");
             else printf("Server closed connection\n");
             exit(1);
@@ -266,64 +279,71 @@ void *recvfunc(void *gamestate)
     }
 }
 
-int TCP_socket_connection()
+TCPsocket TCP_socket_connection()
 {
-    int s, i, t;
-    int counter = 0;
-    struct sockaddr_in serv_addr;
-    char *recvBuffer = malloc(100 * sizeof(char));
+    IPaddress client;
+    TCPsocket socket;
     maxPlayers = 6;
-    char name[25]="douglas";
+    int counter =0,i,t;
     pthread_mutex_init(&sendLock,NULL);
-    //printf("Enter your name(max 25 letters): ");
+//    sendLock=SDL_CreateMutex();
+    char *recvBuffer = malloc(100 * sizeof(char));
 
-    //fgets(name,100,stdin);
-    //name="Douglas";
-    for(i=0;i<25;i++)
-    if(name[i]=='\n')
-        name[i]='\0';
-    strcat(name," connected\n");
-HERE:
-
-    if ((s = socket(AF_INET, SOCK_STREAM, 0))==-1)
-    {
-                perror("ERROR opening socket");
-    }
-  // memset(&serv_addr,0,sizeof(serv_addr));
-    serv_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(atoi("3232"));
-if (connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
-    perror("connect");
-    exit(1);
-  }
-  if (send(s, name, strlen(name), 0) == -1) {
-            perror("send");
-            exit(1);
-        }
-    if ((t=recv(s, recvBuffer, 100, 0)) > 0) {
-            recvBuffer[t] = '\0';
-    }
-     if(strstr(recvBuffer,"Server full\n")){
-        if(counter==0){
-            counter++;
-            close(s);
-            goto HERE;
-        }
-        else if(counter==1){
-            printf("Server full, disconnecting.\n");
-            close(s);
-            return 0;
-        }
-    }
-//    pthread_create(&recvThread,NULL,recvfunc,(void *)&s);
-//    while(1)
+    char name[25]="unknown";
+//    printf("Enter your name(max 25 letters): ");
+//    fgets(name,100,stdin);
+//        //name="Douglas";
+//    for(i=0;i<25;i++)
 //    {
-//        if (send(s, sendBuffer, strlen(sendBuffer), 0) == -1) {
-//            perror("send");
-//            exit(1);
+//        if(name[i]=='\n')
+//        {
+//            name[i]='\0';
 //        }
+//
 //    }
-//    close(s);
-  return s;
-}
+
+    strcat(name," connected\n");
+    HERE:
+
+        if(SDLNet_Init()<0)
+        {
+             printf("SDL_net init error");
+             exit(EXIT_FAILURE);
+        }
+         if(SDLNet_ResolveHost(&client,"127.0.0.1",3232)<0)
+         {
+             printf("SDLnet_resolveHost error");
+             exit(EXIT_FAILURE);
+         }
+         if(!(socket=SDLNet_TCP_Open(&client)))
+        {
+                    printf("SDL_net_TCP_open error");
+                    exit(EXIT_FAILURE);
+        }
+        int len;
+        len =strlen(name);
+        if (SDLNet_TCP_Send(socket,name, len) < len)
+        {
+            fprintf(stderr, "SDLNet_TCP_Send: %s\n", SDLNet_GetError());
+            exit(EXIT_FAILURE);
+        }
+        if ((t = SDLNet_TCP_Recv(socket,recvBuffer, 100)) > 0)
+        {
+            recvBuffer[t] = '\0';
+            printf("message from server :%s",recvBuffer);
+        }
+        if(strstr(recvBuffer,"Server full\n")){
+            if(counter==0){
+                counter++;
+                //SDLNet_TCP_Close(socket);
+                goto HERE;
+            }
+            else if(counter==1){
+                printf("Server full, disconnecting.\n");
+                SDLNet_TCP_Close(socket);
+                return 0;
+            }
+        }else
+
+    return socket;
+ }
