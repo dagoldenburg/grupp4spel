@@ -3,7 +3,6 @@
 #include "gameObject.h"
 #include "gameAction.h"
 #include "time.h"
-#include "gameAI.h"
 
 /*
 Skapar Entitet i minnet och tillsätter alla datamedlemmarna i strukten.

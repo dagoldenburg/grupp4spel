@@ -12,7 +12,6 @@
 #include <SDL2/SDL_net.h>
 
 #endif
-#include <pthread.h>
 
 #include <time.h>
 #include <stdio.h>
@@ -20,7 +19,6 @@
 #include "gameStruct.h"
 #include "gameObject.h"
 #include "main.h"
-#include "gameAI.h"
 #include "gameAction.h"
 #include "gameNet.h"
 #include "updatedMenu.h"
