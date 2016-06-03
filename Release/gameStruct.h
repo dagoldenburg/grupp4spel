@@ -14,14 +14,14 @@
 #include <SDL2/SDL_net.h>
 
 #endif
-typedef struct
+typedef struct // ett objekt
 {
     SDL_Rect rect;
     SDL_Texture* mTexture;
 
 }gameObject;
 
-typedef struct {
+typedef struct { // information om hp
     int sizeOfHealthbar;
     float maxHp;
     float currentHp;
@@ -29,20 +29,18 @@ typedef struct {
     SDL_Rect healthBarMax;
 } HitPointData;
 
-typedef struct {
+typedef struct { // informaton om attack
     SDL_Rect rect;
     int velX;
     int velY;
     SDL_Rect spriteFacing;
 } Attack;
 
-typedef struct
+typedef struct // information om entities
 {
     gameObject object;
     HitPointData hpData;
     SDL_Rect spriteFacing;
-    int mVelX;
-    int mVelY;
     int id;
     int strength;
     Attack attack;
@@ -54,7 +52,7 @@ typedef struct
 
 }Entity;
 
-typedef struct
+typedef struct // information om text och chat relaterade saker
 {
     int enterPressedFlag;
     SDL_Thread *chatThread;
@@ -67,13 +65,13 @@ typedef struct
     int textW,textH,fontSize;
 }Text;
 
-typedef struct
+typedef struct // information om tid
 {
   Uint32 gameStartTime;
   Uint32 gameCurrentTime;
 }Time;
 
-typedef struct
+typedef struct // spelets egen strukt som all nödvändig information ligger i
 {
     SDL_Rect TileClip[4]; ///MAP OBJECT
     gameObject gTileTexture;
@@ -88,6 +86,7 @@ typedef struct
     int aiEntityToken[300];
     int playerEntityToken [6];
 
+    //diverse variabler, mest närrelaterade saker, kanske bör vara en egen net sub-struct
     int nrOfAi;
     TCPsocket socket;
     int mySlot;
@@ -98,7 +97,7 @@ typedef struct
     SDL_Thread *recvThread;
 
 
-
+    // grafik variabler, kanske bör ha en egen grafik sub struct
     SDL_Renderer *renderer;
     SDL_Texture* mAiTexture;
     SDL_Texture* mPlayerTexture;
