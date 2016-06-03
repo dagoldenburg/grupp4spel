@@ -1,0 +1,7 @@
+This program will work with most operatingsystems, it is preffered to use it on a Linux distribution to avoid bugs.
+
+Bugs that may occur:
+Character teleports and gets stuck on coordinates 0,0
+Not able to press the buttons
+Difference in movement speed
+Timer may not occur
