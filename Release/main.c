@@ -190,9 +190,9 @@ int main(int argc, char *argv[])
     strcpy(disconnect,"disconnecting...............");
     safeSend(disconnect,&gamestate);
     if(done==1)
-        lossMenu(renderer);
+        lossWinMenu(renderer,0);
     else if(done==2)
-        lossMenu(renderer);
+        lossWinMenu(renderer,1);
     gamestate.slotNeed = 0;
     play = 0;
     gamestate.playMode = 0;

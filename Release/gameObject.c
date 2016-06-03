@@ -10,8 +10,6 @@ Skapar Entitet i minnet och tillsätter alla datamedlemmarna i strukten.
 
 Entity createEntity(Entity *entity,int x ,int y,int w,int h, float hp)
 {
-    entity->mVelX=0;
-    entity->mVelY=0;
     entity->spriteFacing.x=0;
     entity->spriteFacing.y=0;
     entity->spriteFacing.w=TILESIZE;
