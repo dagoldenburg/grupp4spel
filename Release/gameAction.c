@@ -309,7 +309,6 @@ void controlplayer(GameState *gamestate)
         gamestate->playerEntity[gamestate->mySlot].spriteFacing.x=sprite*32;
         gamestate->playerEntity[gamestate->mySlot].spriteFacing.y=32;
         gamestate->playerEntity[gamestate->mySlot].facing = 2;
-
         gamestate->playerEntity[gamestate->mySlot].object.rect.y += PLAYER_SPEED;
         if(TilemapCollisionDetection(gamestate->playerEntity[gamestate->mySlot].object.rect))
         {
@@ -326,8 +325,9 @@ void controlplayer(GameState *gamestate)
         }
     }
 
-    if(gamestate->playerEntity[gamestate->mySlot].facing == tmpFaceing) {///Om inget har hänt står så tillsätter den facing = 4 vilket animerar så spelaren står stilla
+    if(gamestate->playerEntity[gamestate->mySlot].facing == tmpFaceing && gamestate->playerEntity[gamestate->mySlot].facing!=4) {///Om inget har hänt står så tillsätter den facing = 4 vilket animerar så spelaren står stilla
         gamestate->playerEntity[gamestate->mySlot].facing = 4;
+        updatePlayerMovement(gamestate);
     }
     playWallCollision(&gamestate->playerEntity[gamestate->mySlot].object);
         ///*********************player colliction detector with wall*************************////

@@ -270,8 +270,8 @@ void renderTimer(GameState *g){ // ritar ut en klockan som visar tid
     snprintf(time, 6, "%d:%d",minuteText,secondText);
     g->Text.textSurface = TTF_RenderText_Solid(g->Text.font,time,g->Text.color);
     g->Text.textTexture = SDL_CreateTextureFromSurface(g->renderer,g->Text.textSurface);
-    SDL_QueryTexture(g->Text.textTexture,NULL,NULL,&g->Text.textW,&g->Text.textH);
-    SDL_Rect textRect={SCREEN_WIDTH/2-textW/2,0,g->Text.textW,g->Text.textH};
+    SDL_QueryTexture(g->Text.textTexture,NULL,NULL,&textW,&textH);
+    SDL_Rect textRect={SCREEN_WIDTH/2-textW/2,0,textW,textH};
     SDL_RenderCopy(g->renderer,g->Text.textTexture,NULL,&textRect);
 
 

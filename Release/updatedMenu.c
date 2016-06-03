@@ -10,9 +10,7 @@
 #include "gameStruct.h"
 #include "gameNet.h"
 #include "main.h"
-#include <pthread.h>
 
-//pthread_t recvThread;
 
 int lobbyMenu(SDL_Renderer *renderer, GameState *g){ // Menyn för när man hamnar i lobbyn, man kan välja olika gubbar och trycka på ready eller unready
     int mX, mY,textW,textH,players=1,i;
@@ -72,14 +70,12 @@ int lobbyMenu(SDL_Renderer *renderer, GameState *g){ // Menyn för när man hamn
             {
                 if(event.button.button == SDL_BUTTON_LEFT && (mX>SCREEN_WIDTH*0.345 && mX<SCREEN_WIDTH*0.4297))
                 {
-                    printf("bbb\n");
                     g->playerEntity[g->mySlot].characterType = 0;
                     lobbyMenuTexture = loadImage(g,readyToggle,renderer);
                     sendCharacterType(g);
                 }
                 else if(event.button.button == SDL_BUTTON_LEFT && (mX>SCREEN_WIDTH*0.621 && mX<SCREEN_WIDTH*0.705))
                 {
-                    printf("aaa\n");
                     g->playerEntity[g->mySlot].characterType = 1;
                     lobbyMenuTexture = loadImage(g,readyToggle,renderer);
                     sendCharacterType(g);
@@ -217,7 +213,7 @@ int startMenu(SDL_Renderer* renderer,GameState *g) // startmenyn
             SDL_Quit();
             exit(1);
         }
-        SDL_Rect howToRect={0,SCREEN_HEIGHT/3,300,150};
+        SDL_Rect howToRect={0,SCREEN_HEIGHT/3,350,450};
         SDL_QueryTexture(cantConnectTexture,NULL,NULL,&textW,&textH);
         SDL_Rect cantConnectRect = { SCREEN_WIDTH/2-textW/2,SCREEN_HEIGHT/4,textW,textH };
         SDL_QueryTexture(serverFullTexture,NULL,NULL,&textW,&textH);
