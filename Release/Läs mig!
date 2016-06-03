@@ -2,6 +2,5 @@ This program will work with most operatingsystems, it is preffered to use it on 
 
 Bugs that may occur:
 Character teleports and gets stuck on coordinates 0,0
-Not able to press the buttons
-Difference in movement speed
-Timer may not occur
+Not able to press the buttons(You need to click a lot of times on "ready" if you run windows)
+Timer may not occur(In windows)
